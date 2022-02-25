@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">MaterialYouFileExplorerSample</string>
+    <string name="app_name" translatable="false">MaterialYouFileExplorerSample</string>
+    <string name="path">Path</string>
+    <string name="choose_path">Choose path</string>
 </resources>

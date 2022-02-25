@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="path">路径</string>
+    <string name="choose_path">选择路径</string>
+</resources>
