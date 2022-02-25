@@ -1,0 +1,4 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.MaterialYouFileExplorer" parent="Theme.MaterialYouFileExplorer.Dark" />
+</resources>

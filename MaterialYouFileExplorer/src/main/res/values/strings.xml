@@ -1,0 +1,7 @@
+<resources>
+    <string name="choose_dir">Choose directory</string>
+    <string name="tips">Tips</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="query_dir">Do you want to choose this directory?</string>
+</resources>
