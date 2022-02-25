@@ -2,4 +2,6 @@
 <resources>
     <string name="path">路径</string>
     <string name="choose_path">选择路径</string>
+    <string name="file">文件</string>
+    <string name="directory">文件夹</string>
 </resources>

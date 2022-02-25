@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.permissionx.guolindev.PermissionX
@@ -39,12 +40,11 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     private fun binding() {
+        val isFile = intent.getBooleanExtra("isFile", false)
         binding.topAppBar.setNavigationOnClickListener { finish() }
-        binding.topAppBar.title = getString(R.string.choose_dir)
         adapter = FileListAdapter(this)
         adapter.bind(binding)
-        adapter.init()
-        adapter.initFileList()
+        adapter.init(this, isFile)
         val layoutManager = LinearLayoutManager(this)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
@@ -61,6 +61,13 @@ class ExplorerActivity : AppCompatActivity() {
                     finish()
                 }
                 .show()
+        }
+
+        if (isFile) {
+            binding.floatingActionButton.visibility = View.GONE
+            binding.topAppBar.title = getString(R.string.choose_file)
+        }else{
+            binding.topAppBar.title = getString(R.string.choose_dir)
         }
     }
 

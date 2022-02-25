@@ -41,6 +41,31 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginVertical="20dp"
+                android:checkedButton="@+id/radio_button_file"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/textField">
+
+                <RadioButton
+                    android:id="@+id/radio_button_file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/file" />
+
+                <RadioButton
+                    android:id="@+id/radio_button_dir"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/directory" />
+            </RadioGroup>
+
             <Button
                 android:id="@+id/filledButton"
                 android:layout_width="wrap_content"
@@ -49,7 +74,7 @@
                 android:text="@string/choose_path"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textField" />
+                app:layout_constraintTop_toBottomOf="@id/radioGroup" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,4 +5,6 @@
     <string name="cancel">取消</string>
     <string name="confirm">确定</string>
     <string name="query_dir">是否选择该文件夹？</string>
+    <string name="query_file">是否选择该文件？</string>
+    <string name="choose_file" >选择文件</string>
 </resources>

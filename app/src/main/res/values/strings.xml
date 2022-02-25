@@ -2,4 +2,6 @@
     <string name="app_name" translatable="false">MaterialYouFileExplorerSample</string>
     <string name="path">Path</string>
     <string name="choose_path">Choose path</string>
+    <string name="file">File</string>
+    <string name="directory">Directory</string>
 </resources>

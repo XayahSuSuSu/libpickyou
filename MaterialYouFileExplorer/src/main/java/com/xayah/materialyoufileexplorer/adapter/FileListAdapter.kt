@@ -1,10 +1,14 @@
 package com.xayah.materialyoufileexplorer.adapter
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.AdapterFileBinding
@@ -21,6 +25,10 @@ class FileListAdapter(private val mContext: Context) :
     var fileList: MutableList<FileInfo> = mutableListOf()
     var path = mutableListOf("", "storage", "emulated", "0")
     private lateinit var activityBinding: ActivityExplorerBinding
+
+    var isFile = false
+
+    private lateinit var activity: AppCompatActivity
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         return Holder(
@@ -41,12 +49,27 @@ class FileListAdapter(private val mContext: Context) :
                 AppCompatResources.getDrawable(mContext, R.drawable.ic_round_file)
         }
         binding.content.setOnClickListener {
+            val dirName = binding.titleView.text
             if (current.isDir) {
-                val dirName = binding.titleView.text
                 path.add(dirName.toString())
                 fileList = initFileList()
                 activityBinding.topAppBar.subtitle = pathToString()
                 notifyDataSetChanged()
+            } else {
+                if (isFile) {
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(mContext.getString(R.string.tips))
+                        .setMessage(mContext.getString(R.string.query_file))
+                        .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
+                        .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
+                            path.add(dirName.toString())
+                            val intent =
+                                Intent().apply { putExtra("path", pathToString()) }
+                            activity.setResult(Activity.RESULT_OK, intent)
+                            activity.finish()
+                        }
+                        .show()
+                }
             }
         }
     }
@@ -67,9 +90,12 @@ class FileListAdapter(private val mContext: Context) :
         this.activityBinding = binding
     }
 
-    fun init() {
+    fun init(activity: AppCompatActivity, isFile: Boolean) {
+        this.activity = activity
+        this.isFile = isFile
         fileList = initFileList()
         activityBinding.topAppBar.subtitle = pathToString()
+        initFileList()
     }
 
     fun initFileList(): MutableList<FileInfo> {

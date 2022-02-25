@@ -14,7 +14,12 @@ class MaterialYouFileExplorer {
             }
     }
 
-    fun toExplorer(activity: ComponentActivity) {
-        activityResultLauncher.launch(Intent(activity, ExplorerActivity::class.java))
+    fun toExplorer(activity: ComponentActivity, isFile: Boolean) {
+        activityResultLauncher.launch(
+            Intent(
+                activity,
+                ExplorerActivity::class.java
+            ).putExtra("isFile", isFile)
+        )
     }
 }

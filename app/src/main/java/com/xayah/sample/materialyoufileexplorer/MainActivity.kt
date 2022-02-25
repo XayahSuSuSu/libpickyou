@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.filledButton.setOnClickListener {
-            materialYouFileExplorer.toExplorer(this)
+            materialYouFileExplorer.toExplorer(this, binding.radioButtonFile.isChecked)
         }
     }
 }
