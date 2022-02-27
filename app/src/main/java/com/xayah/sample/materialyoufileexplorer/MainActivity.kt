@@ -1,9 +1,11 @@
 package com.xayah.sample.materialyoufileexplorer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+
 import com.xayah.materialyoufileexplorer.MaterialYouFileExplorer
 import com.xayah.sample.materialyoufileexplorer.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,9 +18,9 @@ class MainActivity : AppCompatActivity() {
 
         binding.filledButton.setOnClickListener {
             materialYouFileExplorer.toExplorer(
-                this,
-                binding.radioButtonFile.isChecked
+                this, binding.radioButtonFile.isChecked
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
+
 }

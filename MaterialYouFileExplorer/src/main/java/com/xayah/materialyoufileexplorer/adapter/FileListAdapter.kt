@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFile
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.AdapterFileBinding
@@ -32,8 +34,7 @@ class FileListAdapter(private val mContext: Context) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         return Holder(
-            AdapterFileBinding
-                .inflate(LayoutInflater.from(mContext), parent, false)
+            AdapterFileBinding.inflate(LayoutInflater.from(mContext), parent, false)
         )
     }
 
@@ -50,6 +51,9 @@ class FileListAdapter(private val mContext: Context) :
         }
         binding.content.setOnClickListener {
             val dirName = binding.titleView.text
+            if ("${pathToString()}/${dirName}" == "/storage/emulated/0/Android") {
+
+            }
             if (current.isDir) {
                 path.add(dirName.toString())
                 fileList = initFileList()
@@ -57,21 +61,18 @@ class FileListAdapter(private val mContext: Context) :
                 notifyDataSetChanged()
             } else {
                 if (isFile) {
-                    MaterialAlertDialogBuilder(activity)
-                        .setTitle(mContext.getString(R.string.tips))
+                    MaterialAlertDialogBuilder(activity).setTitle(mContext.getString(R.string.tips))
                         .setMessage(mContext.getString(R.string.query_file))
                         .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
                         .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
                             path.add(dirName.toString())
-                            val intent =
-                                Intent().apply {
-                                    putExtra("path", pathToString())
-                                    putExtra("isFile", isFile)
-                                }
+                            val intent = Intent().apply {
+                                putExtra("path", pathToString())
+                                putExtra("isFile", isFile)
+                            }
                             activity.setResult(Activity.RESULT_OK, intent)
                             activity.finish()
-                        }
-                        .show()
+                        }.show()
                 }
             }
         }
@@ -106,40 +107,62 @@ class FileListAdapter(private val mContext: Context) :
         val folders = mutableListOf<FileInfo>()
         val files = mutableListOf<FileInfo>()
 
-        try {
-            Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
-                @Throws(IOException::class)
-                override fun preVisitDirectory(
-                    dir: Path,
-                    attrs: BasicFileAttributes
-                ): FileVisitResult {
-                    return if (dir == path) {
-                        FileVisitResult.CONTINUE
-                    } else {
-                        folders.add(FileInfo(dir.toString().split("/").last(), true))
-                        FileVisitResult.SKIP_SUBTREE
+        if (!pathToString().contains("/storage/emulated/0") or pathToString().contains("/storage/emulated/0/Android")) {
+            if (Shell.rootAccess()) {
+                val rootFile = SuFile.open(pathToString())
+                if (rootFile.exists()) {
+                    try {
+                        val list = rootFile.listFiles()!!
+                        for (i in list) {
+                            if (i.isFile) {
+                                files.add(FileInfo(i.name, false))
+                            } else {
+                                folders.add(FileInfo(i.name, true))
+                            }
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
                     }
                 }
+            }
+        } else {
+            try {
+                Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
+                    @Throws(IOException::class)
+                    override fun preVisitDirectory(
+                        dir: Path, attrs: BasicFileAttributes
+                    ): FileVisitResult {
+                        return if (dir == path) {
+                            FileVisitResult.CONTINUE
+                        } else {
+                            folders.add(FileInfo(dir.toString().split("/").last(), true))
+                            FileVisitResult.SKIP_SUBTREE
+                        }
+                    }
 
-                @Throws(IOException::class)
-                override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    files.add(FileInfo(file.toString().split("/").last(), false))
-                    return FileVisitResult.CONTINUE
-                }
+                    @Throws(IOException::class)
+                    override fun visitFile(
+                        file: Path, attrs: BasicFileAttributes
+                    ): FileVisitResult {
+                        files.add(FileInfo(file.toString().split("/").last(), false))
+                        return FileVisitResult.CONTINUE
+                    }
 
-                @Throws(IOException::class)
-                override fun visitFileFailed(file: Path, exc: IOException?): FileVisitResult {
-                    return FileVisitResult.CONTINUE
-                }
+                    @Throws(IOException::class)
+                    override fun visitFileFailed(file: Path, exc: IOException?): FileVisitResult {
+                        return FileVisitResult.CONTINUE
+                    }
 
-                @Throws(IOException::class)
-                override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
-                    return FileVisitResult.CONTINUE
-                }
-            })
-        } catch (e: Exception) {
-            e.printStackTrace()
+                    @Throws(IOException::class)
+                    override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
+                        return FileVisitResult.CONTINUE
+                    }
+                })
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+
         return (folders + files) as MutableList<FileInfo>
     }
 
