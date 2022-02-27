@@ -1,34 +1,39 @@
 package com.xayah.materialyoufileexplorer
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.dylanc.activityresult.launcher.StartActivityLauncher
 
 class MaterialYouFileExplorer {
-    private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
-    fun initialize(activity: ComponentActivity, callback: (path: String) -> Unit) {
-        activityResultLauncher =
-            activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                callback(it.data?.getStringExtra("path") ?: "")
-            }
+    private lateinit var startActivityLauncher: StartActivityLauncher
+
+    fun initialize(activity: ComponentActivity) {
+        startActivityLauncher = StartActivityLauncher(activity)
     }
 
-    fun initialize(fragment: Fragment, callback: (path: String) -> Unit) {
-        activityResultLauncher =
-            fragment.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                callback(it.data?.getStringExtra("path") ?: "")
-            }
+    fun initialize(fragment: Fragment) {
+        startActivityLauncher = StartActivityLauncher(fragment)
     }
 
-    fun toExplorer(context: Context, isFile: Boolean) {
-        activityResultLauncher.launch(
-            Intent(
-                context,
-                ExplorerActivity::class.java
-            ).putExtra("isFile", isFile)
-        )
+    fun toExplorer(
+        context: Context,
+        isFile: Boolean,
+        callback: (path: String, isFile: Boolean) -> Unit
+    ) {
+        val intent = Intent(
+            context,
+            ExplorerActivity::class.java
+        ).putExtra("isFile", isFile)
+        startActivityLauncher.launch(intent) { resultCode, data ->
+            if (resultCode == RESULT_OK) {
+                callback(
+                    data?.getStringExtra("path") ?: "",
+                    data?.getBooleanExtra("isFile", false) ?: false
+                )
+            }
+        }
     }
 }

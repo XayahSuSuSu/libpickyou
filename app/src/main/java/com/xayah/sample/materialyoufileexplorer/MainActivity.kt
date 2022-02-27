@@ -12,12 +12,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val materialYouFileExplorer = MaterialYouFileExplorer()
-        materialYouFileExplorer.initialize(this) {
-            binding.textInputEditText.setText(it)
-        }
+        materialYouFileExplorer.initialize(this)
 
         binding.filledButton.setOnClickListener {
-            materialYouFileExplorer.toExplorer(this, binding.radioButtonFile.isChecked)
+            materialYouFileExplorer.toExplorer(
+                this,
+                binding.radioButtonFile.isChecked
+            ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
 }

@@ -56,7 +56,10 @@ class ExplorerActivity : AppCompatActivity() {
                 .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
                 .setPositiveButton(getString(R.string.confirm)) { _, _ ->
                     val intent =
-                        Intent().apply { putExtra("path", adapter.pathToString()) }
+                        Intent().apply {
+                            putExtra("path", adapter.pathToString())
+                            putExtra("isFile", isFile)
+                        }
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }
@@ -66,7 +69,7 @@ class ExplorerActivity : AppCompatActivity() {
         if (isFile) {
             binding.floatingActionButton.visibility = View.GONE
             binding.topAppBar.title = getString(R.string.choose_file)
-        }else{
+        } else {
             binding.topAppBar.title = getString(R.string.choose_dir)
         }
     }

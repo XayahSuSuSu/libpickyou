@@ -64,7 +64,10 @@ class FileListAdapter(private val mContext: Context) :
                         .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
                             path.add(dirName.toString())
                             val intent =
-                                Intent().apply { putExtra("path", pathToString()) }
+                                Intent().apply {
+                                    putExtra("path", pathToString())
+                                    putExtra("isFile", isFile)
+                                }
                             activity.setResult(Activity.RESULT_OK, intent)
                             activity.finish()
                         }

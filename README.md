@@ -20,16 +20,17 @@ implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.1'
 1. Initialize in `onCreate()`
 ```
 val materialYouFileExplorer = MaterialYouFileExplorer()
-materialYouFileExplorer.initialize(this) {
+materialYouFileExplorer.initialize(this)
+```
+2. Start the explorer activity and handle callback
+```
+materialYouFileExplorer.toExplorer(this, isFile) { path, isFile -> 
     // Code here
-    // Get path string from `it`
 }
 ```
-2. Start the explorer activity
-```
-materialYouFileExplorer.toExplorer(this, $isFile)
-```
-3. Sample
+
+
+## Sample
 ```
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +39,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val materialYouFileExplorer = MaterialYouFileExplorer()
-        materialYouFileExplorer.initialize(this) {
-            binding.textInputEditText.setText(it)
-        }
+        materialYouFileExplorer.initialize(this)
 
         binding.filledButton.setOnClickListener {
-            materialYouFileExplorer.toExplorer(this, binding.radioButtonFile.isChecked)
+            materialYouFileExplorer.toExplorer(
+                this,
+                binding.radioButtonFile.isChecked
+            ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
 }

@@ -60,6 +60,9 @@ dependencies {
 
     // PermissionX
     implementation 'com.guolindev.permissionx:permissionx:1.6.1'
+
+    // ActivityResultLauncher
+    implementation 'com.github.DylanCaiCoding:ActivityResultLauncher:1.1.2'
 }
 
 ext {
