@@ -1,4 +1,6 @@
 # MaterialYouFileExplorer
+[![GitHub release](https://img.shields.io/github/v/release/XayahSuSuSu/Android-MaterialYouFileExplorer?color=orange)](https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer/releases) [![License](https://img.shields.io/github/license/XayahSuSuSu/Android-MaterialYouFileExplorer?color=ff69b4)](./LICENSE)
+
 A file explorer with the style of Material You.
 
 Use this library to select files/directories quickly.
