@@ -14,7 +14,7 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/md_theme_light_inverseOnSurface"
+                android:background="@color/md_theme_inverseOnSurface"
                 app:navigationIcon="@drawable/ic_round_arrow_back" />
 
         </com.google.android.material.appbar.AppBarLayout>

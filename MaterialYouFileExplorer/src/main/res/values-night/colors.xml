@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <color name="md_theme_inverseOnSurface">#424242</color>
 </resources>

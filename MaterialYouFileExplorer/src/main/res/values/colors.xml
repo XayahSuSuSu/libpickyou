@@ -56,4 +56,6 @@
     <color name="md_theme_dark_inversePrimary">#6750A4</color>
     <color name="md_theme_dark_shadow">#000000</color>
     <color name="md_theme_dark_primaryInverse">#6750A4</color>
+
+    <color name="md_theme_inverseOnSurface">@color/md_theme_light_inverseOnSurface</color>
 </resources>
