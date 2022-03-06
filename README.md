@@ -5,6 +5,12 @@ A file explorer with the style of Material You.
 
 Use this library to select files/directories quickly.
 
+![Sample3](doc/images/Sample1.jpg "Sample1")
+
+![Sample3](doc/images/Sample2.jpg "Sample2")
+
+![Sample3](doc/images/Sample3.jpg "Sample3")
+
 ## Implementation
 1. Enable `mavenCentral()` in `settings.gradle`
 ```
