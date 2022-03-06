@@ -1,4 +1,7 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.MaterialYouFileExplorer" parent="Theme.MaterialYouFileExplorer.Dark" />
+    <style name="Base.Theme.MaterialYouFileExplorer" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    </style>
 </resources>
