@@ -24,9 +24,11 @@ import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
 import java.io.IOException
+import java.lang.Error
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.extension
 
 class ExplorerActivity : AppCompatActivity() {
     lateinit var binding: ActivityExplorerBinding
@@ -61,6 +63,9 @@ class ExplorerActivity : AppCompatActivity() {
 
     private fun binding() {
         val isFile = intent.getBooleanExtra("isFile", false)
+        val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
+        val hasFilter = suffixFilter != null
+        val filterWhiteList = intent.getBooleanExtra("filterWhiteList", true)
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)
@@ -87,7 +92,8 @@ class ExplorerActivity : AppCompatActivity() {
                             val list = rootFile.listFiles()!!
                             for (i in list) {
                                 if (i.isFile) {
-                                    model.files.add(FileInfo(i.name, false))
+                                    if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhiteList)
+                                            model.files.add(FileInfo(i.name, false))
                                 } else {
                                     model.folders.add(FileInfo(i.name, true))
                                 }
@@ -116,7 +122,8 @@ class ExplorerActivity : AppCompatActivity() {
                         override fun visitFile(
                             file: Path, attrs: BasicFileAttributes
                         ): FileVisitResult {
-                            model.files.add(FileInfo(file.toString().split("/").last(), false))
+                            if (!hasFilter || suffixFilter?.contains(file.extension) == filterWhiteList)
+                                model.files.add(FileInfo(file.toString().split("/").last(), false))
                             return FileVisitResult.CONTINUE
                         }
 

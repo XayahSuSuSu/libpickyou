@@ -11,6 +11,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
+        val ext: ArrayList<String> = ArrayList()
+        ext.add("mp4")
+        ext.add("txt")
         setContentView(binding.root)
 
         val materialYouFileExplorer = MaterialYouFileExplorer()
@@ -18,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.filledButton.setOnClickListener {
             materialYouFileExplorer.toExplorer(
-                this, binding.radioButtonFile.isChecked, "Custom Title"
+                this, binding.radioButtonFile.isChecked, "Custom Title", ext, false
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
