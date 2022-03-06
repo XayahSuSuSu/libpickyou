@@ -25,5 +25,4 @@ class MainActivity : AppCompatActivity() {
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
-
 }
