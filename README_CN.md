@@ -1,13 +1,9 @@
-<div align="center">
-	<span style="font-weight: bold"> English | <a href=README_CN.md> 中文 </a> </span>
-</div>
-
 # MaterialYouFileExplorer
 [![GitHub release](https://img.shields.io/github/v/release/XayahSuSuSu/Android-MaterialYouFileExplorer?color=orange)](https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer/releases) [![License](https://img.shields.io/github/license/XayahSuSuSu/Android-MaterialYouFileExplorer?color=ff69b4)](./LICENSE)
 
-A file explorer with the style of Material You.
+一个Material You风格的文件浏览器第三方库。
 
-Use this library to select files/directories quickly.
+使用这个第三方库来快速选择文件/文件夹。
 
 ![Sample3](doc/images/Sample1.jpg "Sample1")
 
@@ -15,32 +11,32 @@ Use this library to select files/directories quickly.
 
 ![Sample3](doc/images/Sample3.jpg "Sample3")
 
-## Implementation
-1. Enable `mavenCentral()` in `settings.gradle`
+## 引入
+1. 在 `settings.gradle` 中开启 `mavenCentral()`
 ```
 repositories {
         ......
         mavenCentral()
     }
 ```
-2. Implementation
+2. 引入MaterialYouFileExplorer
 ```
 implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.4'
 ```
 
-## Usage
-1. Initialize in `onCreate()`
+## 使用
+1. 在 `onCreate()` 中初始化
 ```
 val materialYouFileExplorer = MaterialYouFileExplorer()
 materialYouFileExplorer.initialize(this)
 ```
-2. Start the explorer activity and handle callback
+2. 打开Explorer Activity并且处理回调
 ```
 materialYouFileExplorer.toExplorer(this, isFile) { path, isFile -> 
     // Code here
 }
 ```
-#### Custom title
+#### 自定义标题
 ```
 materialYouFileExplorer.toExplorer(this, isFile, "Custom Title") { path, isFile -> 
     // Code here
@@ -48,7 +44,7 @@ materialYouFileExplorer.toExplorer(this, isFile, "Custom Title") { path, isFile 
 ```
 
 
-## Sample
+## 样本
 ```
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-## Credits
+## 鸣谢
 - [libsu](https://github.com/topjohnwu/libsu)
 - [PermissionX](https://github.com/guolindev/PermissionX)
 - [MaterialFiles](https://github.com/zhanghai/MaterialFiles)
