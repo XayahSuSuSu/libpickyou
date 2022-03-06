@@ -21,7 +21,7 @@ repositories {
 ```
 2. 引入MaterialYouFileExplorer
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.4'
+implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.5'
 ```
 
 ## 使用
