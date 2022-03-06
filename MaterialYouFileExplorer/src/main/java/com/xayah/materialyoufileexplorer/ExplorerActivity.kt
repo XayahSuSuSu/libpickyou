@@ -92,7 +92,7 @@ class ExplorerActivity : AppCompatActivity() {
                                     model.folders.add(FileInfo(i.name, true))
                                 }
                             }
-                        } catch (e: IOException) {
+                        } catch (e: NullPointerException) {
                             e.printStackTrace()
                         }
                     }
