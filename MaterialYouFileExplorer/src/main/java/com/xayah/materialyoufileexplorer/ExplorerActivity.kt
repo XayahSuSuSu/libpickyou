@@ -27,6 +27,7 @@ import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.extension
 
 class ExplorerActivity : AppCompatActivity() {
     lateinit var binding: ActivityExplorerBinding
@@ -61,6 +62,9 @@ class ExplorerActivity : AppCompatActivity() {
 
     private fun binding() {
         val isFile = intent.getBooleanExtra("isFile", false)
+        val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
+        val hasFilter = suffixFilter != null
+        val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)
@@ -87,7 +91,8 @@ class ExplorerActivity : AppCompatActivity() {
                             val list = rootFile.listFiles()!!
                             for (i in list) {
                                 if (i.isFile) {
-                                    model.files.add(FileInfo(i.name, false))
+                                    if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist)
+                                            model.files.add(FileInfo(i.name, false))
                                 } else {
                                     model.folders.add(FileInfo(i.name, true))
                                 }
@@ -116,7 +121,8 @@ class ExplorerActivity : AppCompatActivity() {
                         override fun visitFile(
                             file: Path, attrs: BasicFileAttributes
                         ): FileVisitResult {
-                            model.files.add(FileInfo(file.toString().split("/").last(), false))
+                            if (!hasFilter || suffixFilter?.contains(file.extension) == filterWhitelist)
+                                model.files.add(FileInfo(file.toString().split("/").last(), false))
                             return FileVisitResult.CONTINUE
                         }
 

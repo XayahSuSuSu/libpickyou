@@ -22,12 +22,16 @@ class MaterialYouFileExplorer {
         context: Context,
         isFile: Boolean,
         title: String = "default",
+        suffixFilter: ArrayList<String>? = null,
+        filterWhitelist: Boolean = true,
         callback: (path: String, isFile: Boolean) -> Unit
     ) {
         val intent = Intent(
             context,
             ExplorerActivity::class.java
         ).putExtra("isFile", isFile).putExtra("title", title)
+            .putStringArrayListExtra("suffixFilter", suffixFilter)
+            .putExtra("filterWhitelist", filterWhitelist)
         startActivityLauncher.launch(intent) { resultCode, data ->
             if (resultCode == RESULT_OK) {
                 callback(
