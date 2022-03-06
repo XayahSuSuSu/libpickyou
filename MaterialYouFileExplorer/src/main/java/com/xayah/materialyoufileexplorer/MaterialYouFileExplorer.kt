@@ -21,12 +21,13 @@ class MaterialYouFileExplorer {
     fun toExplorer(
         context: Context,
         isFile: Boolean,
+        title: String = "default",
         callback: (path: String, isFile: Boolean) -> Unit
     ) {
         val intent = Intent(
             context,
             ExplorerActivity::class.java
-        ).putExtra("isFile", isFile)
+        ).putExtra("isFile", isFile).putExtra("title", title)
         startActivityLauncher.launch(intent) { resultCode, data ->
             if (resultCode == RESULT_OK) {
                 callback(

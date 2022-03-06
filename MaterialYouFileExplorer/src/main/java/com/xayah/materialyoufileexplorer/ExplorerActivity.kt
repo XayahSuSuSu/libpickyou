@@ -77,9 +77,12 @@ class ExplorerActivity : AppCompatActivity() {
 
         if (isFile) {
             binding.floatingActionButton.visibility = View.GONE
-            binding.topAppBar.title = getString(R.string.choose_file)
+        }
+        if (intent.getStringExtra("title") == "default") {
+            binding.topAppBar.title =
+                if (isFile) getString(R.string.choose_file) else getString(R.string.choose_dir)
         } else {
-            binding.topAppBar.title = getString(R.string.choose_dir)
+            binding.topAppBar.title = intent.getStringExtra("title")
         }
     }
 
