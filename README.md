@@ -15,7 +15,7 @@ repositories {
 ```
 2. Implementation
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.3'
+implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.4'
 ```
 
 ## Usage
@@ -27,6 +27,12 @@ materialYouFileExplorer.initialize(this)
 2. Start the explorer activity and handle callback
 ```
 materialYouFileExplorer.toExplorer(this, isFile) { path, isFile -> 
+    // Code here
+}
+```
+#### Custom title
+```
+materialYouFileExplorer.toExplorer(this, isFile, "Custom Title") { path, isFile -> 
     // Code here
 }
 ```
@@ -45,8 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.filledButton.setOnClickListener {
             materialYouFileExplorer.toExplorer(
-                this,
-                binding.radioButtonFile.isChecked
+                this, binding.radioButtonFile.isChecked, "Custom Title"
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
