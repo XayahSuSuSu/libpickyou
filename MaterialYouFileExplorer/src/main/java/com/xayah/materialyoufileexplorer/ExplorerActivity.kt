@@ -8,19 +8,30 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.view.ViewGroup
+import android.widget.HorizontalScrollView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.permissionx.guolindev.PermissionX
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFile
 import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
+import com.xayah.materialyoufileexplorer.model.FileInfo
+import java.io.IOException
+import java.nio.file.*
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.TimeUnit
 
 class ExplorerActivity : AppCompatActivity() {
     lateinit var binding: ActivityExplorerBinding
     lateinit var adapter: FileListAdapter
+    val model: ExplorerViewModel by viewModels()
 
     init {
         Shell.enableVerboseLogging = BuildConfig.DEBUG
@@ -40,34 +51,139 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (adapter.pathToString() == "") {
+        if (model.getPath() == "") {
             super.onBackPressed()
         } else {
-            adapter.path.removeLast()
-            val fileList = adapter.initFileList()
-            adapter.fileList = fileList
-            binding.topAppBar.subtitle = adapter.pathToString()
+            model.removePath()
             adapter.notifyDataSetChanged()
         }
     }
 
     private fun binding() {
         val isFile = intent.getBooleanExtra("isFile", false)
-        binding.topAppBar.setNavigationOnClickListener { finish() }
-        adapter = FileListAdapter(this)
+
+        adapter = FileListAdapter(this, model)
         adapter.bind(binding)
         adapter.init(this, isFile)
         val layoutManager = LinearLayoutManager(this)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
         binding.topAppBar.setNavigationOnClickListener { finish() }
+
+        model.pathList.observe(this) {
+            val path = Paths.get(model.getPath())
+            model.folders.clear()
+            model.files.clear()
+            if (model.getPath() != "")
+                model.folders.add(FileInfo("..", true))
+
+            if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
+                    .contains("/storage/emulated/0/Android")
+            ) {
+                if (Shell.rootAccess()) {
+                    val rootFile = SuFile.open(model.getPath())
+                    if (rootFile.exists()) {
+                        try {
+                            val list = rootFile.listFiles()!!
+                            for (i in list) {
+                                if (i.isFile) {
+                                    model.files.add(FileInfo(i.name, false))
+                                } else {
+                                    model.folders.add(FileInfo(i.name, true))
+                                }
+                            }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            } else {
+                try {
+                    Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
+                        @Throws(IOException::class)
+                        override fun preVisitDirectory(
+                            dir: Path, attrs: BasicFileAttributes
+                        ): FileVisitResult {
+                            return if (dir == path) {
+                                FileVisitResult.CONTINUE
+                            } else {
+                                model.folders.add(FileInfo(dir.toString().split("/").last(), true))
+                                FileVisitResult.SKIP_SUBTREE
+                            }
+                        }
+
+                        @Throws(IOException::class)
+                        override fun visitFile(
+                            file: Path, attrs: BasicFileAttributes
+                        ): FileVisitResult {
+                            model.files.add(FileInfo(file.toString().split("/").last(), false))
+                            return FileVisitResult.CONTINUE
+                        }
+
+                        @Throws(IOException::class)
+                        override fun visitFileFailed(
+                            file: Path,
+                            exc: IOException?
+                        ): FileVisitResult {
+                            return FileVisitResult.CONTINUE
+                        }
+
+                        @Throws(IOException::class)
+                        override fun postVisitDirectory(
+                            dir: Path,
+                            exc: IOException?
+                        ): FileVisitResult {
+                            return FileVisitResult.CONTINUE
+                        }
+                    })
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            model.fileList = (model.folders + model.files) as MutableList<FileInfo>
+            binding.topAppBar.subtitle =
+                "${if (model.getPath() != "") model.folders.size - 1 else model.folders.size} ${
+                    getString(
+                        R.string.folders
+                    )
+                }, ${model.files.size} ${getString(R.string.files)}"
+
+            binding.chipGroup.removeAllViews()
+            for ((index, i) in it.withIndex()) {
+                if (i != "") {
+                    val chip = Chip(this)
+                    chip.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                    chip.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    chip.chipStartPadding = resources.getDimension(R.dimen.chip_padding)
+                    chip.chipEndPadding = resources.getDimension(R.dimen.chip_padding)
+                    chip.layoutDirection = View.LAYOUT_DIRECTION_RTL
+                    chip.chipStrokeWidth = 0F
+                    chip.chipIcon =
+                        AppCompatResources.getDrawable(
+                            this,
+                            R.drawable.ic_round_keyboard_arrow_left
+                        )
+                    chip.setOnClickListener {
+                        model.returnPath(index)
+                        adapter.notifyDataSetChanged()
+                    }
+                    chip.text = i
+                    binding.chipGroup.addView(chip)
+                    binding.horizontalScrollView.post {
+                        binding.horizontalScrollView.fullScroll(HorizontalScrollView.FOCUS_RIGHT)
+                    }
+                }
+            }
+        }
+
         binding.floatingActionButton.setOnClickListener {
             MaterialAlertDialogBuilder(this).setTitle(getString(R.string.tips))
                 .setMessage(getString(R.string.query_dir))
                 .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
                 .setPositiveButton(getString(R.string.confirm)) { _, _ ->
                     val intent = Intent().apply {
-                        putExtra("path", adapter.pathToString())
+                        putExtra("path", model.getPath())
                         putExtra("isFile", isFile)
                     }
                     setResult(Activity.RESULT_OK, intent)

@@ -7,4 +7,6 @@
     <string name="query_dir">是否选择该文件夹？</string>
     <string name="query_file">是否选择该文件？</string>
     <string name="choose_file" >选择文件</string>
+    <string name="folders">个文件夹</string>
+    <string name="files">个文件</string>
 </resources>

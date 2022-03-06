@@ -6,4 +6,6 @@
     <string name="query_dir">Do you want to choose this directory?</string>
     <string name="query_file">Do you want to choose this file?</string>
     <string name="choose_file" >Choose file</string>
+    <string name="folders" >folders</string>
+    <string name="files" >files</string>
 </resources>
