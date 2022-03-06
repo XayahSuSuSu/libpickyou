@@ -45,7 +45,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // LiveData
-    def lifecycle_version = "2.4.0"
+    def lifecycle_version = "2.4.1"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation "androidx.activity:activity-ktx:1.3.1"
     implementation "androidx.fragment:fragment-ktx:1.3.6"
@@ -59,7 +59,7 @@ dependencies {
     implementation 'com.github.DylanCaiCoding:ActivityResultLauncher:1.1.2'
 
     // Libsu
-    def libsuVersion = '3.2.1'
+    def libsuVersion = '4.0.0'
     // The core module is used by all other components
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
     // Optional: For com.topjohnwu.superuser.io classes
