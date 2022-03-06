@@ -63,3 +63,8 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
+## Credits
+- [libsu](https://github.com/topjohnwu/libsu)
+- [PermissionX](https://github.com/guolindev/PermissionX)
+- [MaterialFiles](https://github.com/zhanghai/MaterialFiles)
