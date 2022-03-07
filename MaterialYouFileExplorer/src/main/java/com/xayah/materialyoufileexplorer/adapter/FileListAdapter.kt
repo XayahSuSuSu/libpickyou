@@ -11,9 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.Coil
 import coil.ImageLoader
 import coil.clear
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
+import coil.decode.VideoFrameDecoder
 import coil.loadAny
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
@@ -119,13 +117,11 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
         this.isFile = isFile
     }
 
-    fun initializeCoil() {
+    private fun initializeCoil() {
         Coil.setImageLoader(
             ImageLoader.Builder(mContext)
                 .componentRegistry {
-                    add(ImageDecoderDecoder(mContext))
-                    add(GifDecoder())
-                    add(SvgDecoder(mContext, false))
+                    add(VideoFrameDecoder(mContext))
                 }
                 .build()
         )
