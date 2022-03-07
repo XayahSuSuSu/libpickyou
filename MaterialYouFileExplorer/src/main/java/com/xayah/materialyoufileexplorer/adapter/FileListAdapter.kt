@@ -72,8 +72,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
             val file = File(model.getPath(current.name))
             if (isThumbnailable(file.extension)) {
                 binding.iconView.background = null
-                binding.iconView.loadAny(file)
-                binding.iconView.metadata
+                binding.iconView.load(file)
             } else {
                 binding.iconView.background =
                     AppCompatResources.getDrawable(mContext, R.drawable.ic_round_file)
