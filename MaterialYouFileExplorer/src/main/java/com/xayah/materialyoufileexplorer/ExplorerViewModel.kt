@@ -15,6 +15,11 @@ class ExplorerViewModel : ViewModel() {
         return pathList.value?.joinToString(separator = "/") ?: ""
     }
 
+    fun getPath(name: String): String {
+        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        return newPath.joinToString(separator = "/") + "/" + name
+    }
+
     fun addPath(path: String) {
         val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
         newPath.add(path)

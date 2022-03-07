@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import coil.loadAny
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.AdapterFileBinding
+import java.io.File
 
 
 class FileListAdapter(private val mContext: Context, private val model: ExplorerViewModel) :
@@ -23,7 +25,13 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
 
     private var isFile = false
 
+    private val supportExt = arrayListOf("jpg", "png")
+
     private lateinit var activity: AppCompatActivity
+
+    private fun isThumbnailable (ext: String): Boolean {
+        return supportExt.contains(ext)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         return Holder(
@@ -40,12 +48,17 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                 binding.iconView.background =
                     AppCompatResources.getDrawable(mContext, R.drawable.ic_round_return)
             } else {
-                binding.iconView.background =
-                    AppCompatResources.getDrawable(mContext, R.drawable.ic_round_folder)
+                    binding.iconView.background =
+                        AppCompatResources.getDrawable(mContext, R.drawable.ic_round_folder)
             }
         } else {
-            binding.iconView.background =
-                AppCompatResources.getDrawable(mContext, R.drawable.ic_round_file)
+            val file = File(model.getPath(current.name))
+            if (isThumbnailable(file.extension)) {
+                binding.iconView.loadAny(file)
+            } else {
+                binding.iconView.background =
+                    AppCompatResources.getDrawable(mContext, R.drawable.ic_round_file)
+            }
         }
         binding.content.setOnClickListener {
             val dirName = binding.titleView.text
