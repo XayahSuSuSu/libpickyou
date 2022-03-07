@@ -8,6 +8,12 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import coil.Coil
+import coil.ImageLoader
+import coil.clear
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.decode.SvgDecoder
 import coil.loadAny
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
@@ -25,7 +31,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
 
     private var isFile = false
 
-    private val supportExt = arrayListOf("jpg", "png")
+    private val supportExt = arrayListOf("jpg", "png", "mp4")
 
     private lateinit var activity: AppCompatActivity
 
@@ -43,6 +49,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
         val current = model.fileList[position]
         val binding = holder.binding
         binding.titleView.text = current.name
+        binding.iconView.clear()
         if (current.isDir) {
             if (current.name == "..") {
                 binding.iconView.background =
@@ -54,6 +61,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
         } else {
             val file = File(model.getPath(current.name))
             if (isThumbnailable(file.extension)) {
+                binding.iconView.background = null
                 binding.iconView.loadAny(file)
             } else {
                 binding.iconView.background =
@@ -106,7 +114,20 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
     }
 
     fun init(activity: AppCompatActivity, isFile: Boolean) {
+        initializeCoil()
         this.activity = activity
         this.isFile = isFile
+    }
+
+    fun initializeCoil() {
+        Coil.setImageLoader(
+            ImageLoader.Builder(mContext)
+                .componentRegistry {
+                    add(ImageDecoderDecoder(mContext))
+                    add(GifDecoder())
+                    add(SvgDecoder(mContext, false))
+                }
+                .build()
+        )
     }
 }
