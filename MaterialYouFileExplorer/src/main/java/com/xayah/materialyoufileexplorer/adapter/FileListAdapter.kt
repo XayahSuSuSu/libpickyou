@@ -8,11 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
-import coil.Coil
-import coil.ImageLoader
-import coil.clear
+import coil.*
 import coil.decode.VideoFrameDecoder
-import coil.loadAny
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
 import com.xayah.materialyoufileexplorer.R
@@ -29,7 +26,22 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
 
     private var isFile = false
 
-    private val supportExt = arrayListOf("jpg", "png", "mp4", "gif")
+    private val supportExt = setOf(
+        /* Video / Container */
+        "264", "265", "3g2", "3ga", "3gp", "3gp2", "3gpp", "3gpp2", "3iv", "amr", "asf",
+        "asx", "av1", "avc", "avf", "avi", "bdm", "bdmv", "clpi", "cpi", "divx", "dv", "evo",
+        "evob", "f4v", "flc", "fli", "flic", "flv", "gxf", "h264", "h265", "hdmov", "hdv",
+        "hevc", "lrv", "m1u", "m1v", "m2t", "m2ts", "m2v", "m4u", "m4v", "mkv", "mod", "moov",
+        "mov", "mp2", "mp2v", "mp4", "mp4v", "mpe", "mpeg", "mpeg2", "mpeg4", "mpg", "mpg4",
+        "mpl", "mpls", "mpv", "mpv2", "mts", "mtv", "mxf", "mxu", "nsv", "nut", "ogg", "ogm",
+        "ogv", "ogx", "qt", "qtvr", "rm", "rmj", "rmm", "rms", "rmvb", "rmx", "rv", "rvx",
+        "sdp", "tod", "trp", "ts", "tsa", "tsv", "tts", "vc1", "vfw", "vob", "vro", "webm",
+        "wm", "wmv", "wmx", "x264", "x265", "xvid", "y4m", "yuv",
+
+        /* Picture */
+        "apng", "bmp", "exr", "gif", "j2c", "j2k", "jfif", "jp2", "jpc", "jpe", "jpeg", "jpg",
+        "jpg2", "png", "tga", "tif", "tiff", "webp",
+    )
 
     private lateinit var activity: AppCompatActivity
 
@@ -61,6 +73,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
             if (isThumbnailable(file.extension)) {
                 binding.iconView.background = null
                 binding.iconView.loadAny(file)
+                binding.iconView.metadata
             } else {
                 binding.iconView.background =
                     AppCompatResources.getDrawable(mContext, R.drawable.ic_round_file)
