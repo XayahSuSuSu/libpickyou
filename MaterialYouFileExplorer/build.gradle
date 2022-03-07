@@ -64,6 +64,13 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
     // Optional: For com.topjohnwu.superuser.io classes
     implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
+
+    // Coil
+    def coil_version = '1.4.0'
+    implementation "io.coil-kt:coil:$coil_version"
+    implementation "io.coil-kt:coil-gif:$coil_version"
+    implementation "io.coil-kt:coil-svg:$coil_version"
+    implementation "io.coil-kt:coil-video:$coil_version"
 }
 
 ext {

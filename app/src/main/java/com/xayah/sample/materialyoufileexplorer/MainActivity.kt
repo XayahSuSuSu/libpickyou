@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.filledButton.setOnClickListener {
             materialYouFileExplorer.toExplorer(
-                this, binding.radioButtonFile.isChecked, "Custom Title", ext, true
+                this, binding.radioButtonFile.isChecked, "Custom Title", null, true
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }

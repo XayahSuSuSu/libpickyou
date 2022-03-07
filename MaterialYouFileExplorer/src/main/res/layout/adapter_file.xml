@@ -14,7 +14,7 @@
         android:paddingVertical="16dp"
         android:paddingEnd="17.5dp">
 
-        <View
+        <ImageView
             android:id="@+id/icon_view"
             android:layout_width="30dp"
             android:layout_height="30dp"
