@@ -29,7 +29,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
 
     private var isFile = false
 
-    private val supportExt = arrayListOf("jpg", "png", "mp4")
+    private val supportExt = arrayListOf("jpg", "png", "mp4", "gif")
 
     private lateinit var activity: AppCompatActivity
 
