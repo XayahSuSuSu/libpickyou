@@ -11,4 +11,6 @@
     <string name="files">个文件</string>
     <string name="delete">删除</string>
     <string name="query_delete_file">是否删除此文件或文件夹？</string>
+    <string name="rename">重命名</string>
+    <string name="new_name">新名称</string>
 </resources>

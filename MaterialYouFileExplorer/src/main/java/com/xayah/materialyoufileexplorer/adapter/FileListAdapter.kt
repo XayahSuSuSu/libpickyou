@@ -23,6 +23,7 @@ import com.xayah.materialyoufileexplorer.ExplorerViewModel
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.AdapterFileBinding
+import com.xayah.materialyoufileexplorer.databinding.DialogTextFieldBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
 import java.io.File
 
@@ -178,6 +179,38 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                                 model.refreshPath()
                             }
                         }.show()
+                }
+                R.id.menu_rename -> {
+                    val bindingDialogTextField =
+                        DialogTextFieldBinding.inflate(activity.layoutInflater)
+                    bindingDialogTextField.textLayout.hint = mContext.getString(R.string.new_name)
+                    bindingDialogTextField.textField.setText(fileInfo.name)
+                    MaterialAlertDialogBuilder(activity)
+                        .setTitle(mContext.getString(R.string.rename))
+                        .setView(bindingDialogTextField.root)
+                        .setCancelable(true)
+                        .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
+                            val filePath = "${model.getPath()}/${fileInfo.name}"
+                            val newFilePath =
+                                "${model.getPath()}/${bindingDialogTextField.textField.text}"
+                            if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
+                                    .contains("/storage/emulated/0/Android")
+                            ) {
+                                if (Shell.rootAccess()) {
+                                    val file = SuFile(filePath)
+                                    val newFile = SuFile(newFilePath)
+                                    file.renameTo(newFile)
+                                    model.refreshPath()
+                                }
+                            } else {
+                                val file = File(filePath)
+                                val newFile = File(newFilePath)
+                                file.renameTo(newFile)
+                                model.refreshPath()
+                            }
+                        }
+                        .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
+                        .show()
                 }
             }
             true
