@@ -39,4 +39,9 @@ class ExplorerViewModel : ViewModel() {
         }
         pathList.value = newPath
     }
+
+    fun refreshPath() {
+        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        pathList.value = newPath
+    }
 }

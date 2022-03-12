@@ -56,7 +56,6 @@ class ExplorerActivity : AppCompatActivity() {
             super.onBackPressed()
         } else {
             model.removePath()
-            adapter.notifyDataSetChanged()
         }
     }
 
@@ -172,7 +171,6 @@ class ExplorerActivity : AppCompatActivity() {
                         )
                     chip.setOnClickListener {
                         model.returnPath(index)
-                        adapter.notifyDataSetChanged()
                     }
                     chip.text = i
                     binding.chipGroup.addView(chip)
@@ -181,6 +179,7 @@ class ExplorerActivity : AppCompatActivity() {
                     }
                 }
             }
+            adapter.notifyDataSetChanged()
         }
 
         binding.floatingActionButton.setOnClickListener {

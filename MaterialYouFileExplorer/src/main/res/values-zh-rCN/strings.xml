@@ -9,4 +9,6 @@
     <string name="choose_file" >选择文件</string>
     <string name="folders">个文件夹</string>
     <string name="files">个文件</string>
+    <string name="delete">删除</string>
+    <string name="query_delete_file">是否删除此文件或文件夹？</string>
 </resources>

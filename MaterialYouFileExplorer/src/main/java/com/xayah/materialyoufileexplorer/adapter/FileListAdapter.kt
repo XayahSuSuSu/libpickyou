@@ -3,18 +3,27 @@ package com.xayah.materialyoufileexplorer.adapter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import coil.*
+import coil.Coil
+import coil.ImageLoader
+import coil.clear
 import coil.decode.VideoFrameDecoder
+import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFile
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.AdapterFileBinding
+import com.xayah.materialyoufileexplorer.model.FileInfo
 import java.io.File
 
 
@@ -87,7 +96,6 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                 } else {
                     model.addPath(dirName.toString())
                 }
-                notifyDataSetChanged()
             } else {
                 if (isFile) {
                     MaterialAlertDialogBuilder(activity).setTitle(mContext.getString(R.string.tips))
@@ -104,6 +112,11 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                         }.show()
                 }
             }
+        }
+
+        binding.content.setOnLongClickListener {
+            showPopupMenu(it, current)
+            true
         }
     }
 
@@ -137,5 +150,37 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                 }
                 .build()
         )
+    }
+
+    private fun showPopupMenu(v: View, fileInfo: FileInfo) {
+        val popupMenu = PopupMenu(v.context, v, Gravity.END)
+        popupMenu.menuInflater.inflate(R.menu.menu_on_long_click, popupMenu.menu)
+        popupMenu.show()
+        popupMenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.menu_delete -> {
+                    MaterialAlertDialogBuilder(activity).setTitle(mContext.getString(R.string.tips))
+                        .setMessage(mContext.getString(R.string.query_delete_file))
+                        .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
+                        .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
+                            val filePath = "${model.getPath()}/${fileInfo.name}"
+                            if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
+                                    .contains("/storage/emulated/0/Android")
+                            ) {
+                                if (Shell.rootAccess()) {
+                                    val file = SuFile(filePath)
+                                    file.deleteRecursive()
+                                    model.refreshPath()
+                                }
+                            } else {
+                                val file = File(filePath)
+                                file.deleteRecursively()
+                                model.refreshPath()
+                            }
+                        }.show()
+                }
+            }
+            true
+        }
     }
 }

@@ -8,4 +8,6 @@
     <string name="choose_file" >Choose file</string>
     <string name="folders" >folders</string>
     <string name="files" >files</string>
+    <string name="delete">Delete</string>
+    <string name="query_delete_file">Do you want to delete this file or directory?</string>
 </resources>
