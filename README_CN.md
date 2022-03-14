@@ -1,9 +1,18 @@
 # MaterialYouFileExplorer
 [![GitHub release](https://img.shields.io/github/v/release/XayahSuSuSu/Android-MaterialYouFileExplorer?color=orange)](https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer/releases) [![License](https://img.shields.io/github/license/XayahSuSuSu/Android-MaterialYouFileExplorer?color=ff69b4)](./LICENSE)
 
-一个Material You风格的文件浏览器第三方库。
+一个Material You风格的文件浏览器（选择器）第三方库。
 
 使用这个第三方库来快速选择文件/文件夹。
+
+## 特点
+- 易于导入和使用。
+- 高度可自定义化
+- 支持选择文件或文件夹
+- 支持过滤
+- 支持选择文件/文件夹时管理文件/文件夹（删除、重命名）
+
+## 截图
 
 ![Sample3](doc/images/Sample1.jpg "Sample1")
 
@@ -21,7 +30,7 @@ repositories {
 ```
 2. 引入MaterialYouFileExplorer
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.6'
+implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.7'
 ```
 
 ## 使用
@@ -57,7 +66,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.filledButton.setOnClickListener {
             materialYouFileExplorer.toExplorer(
-                this, binding.radioButtonFile.isChecked, "Custom Title"
+                this,
+                binding.radioButtonFile.isChecked,
+                if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default",
+                ArrayList(binding.textInputEditTextFilter.text.toString().split(",")),
+                binding.checkBoxFilterWhitelist.isChecked
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
@@ -68,3 +81,5 @@ class MainActivity : AppCompatActivity() {
 - [libsu](https://github.com/topjohnwu/libsu)
 - [PermissionX](https://github.com/guolindev/PermissionX)
 - [MaterialFiles](https://github.com/zhanghai/MaterialFiles)
+- [Coil](https://github.com/coil-kt/coil)
+- [ActivityResultLauncher](https://github.com/DylanCaiCoding/ActivityResultLauncher)

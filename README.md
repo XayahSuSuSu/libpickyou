@@ -5,9 +5,18 @@
 # MaterialYouFileExplorer
 [![GitHub release](https://img.shields.io/github/v/release/XayahSuSuSu/Android-MaterialYouFileExplorer?color=orange)](https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer/releases) [![License](https://img.shields.io/github/license/XayahSuSuSu/Android-MaterialYouFileExplorer?color=ff69b4)](./LICENSE)
 
-A file explorer with the style of Material You.
+A file explorer(picker) with the style of Material You.
 
-Use this library to select files/directories quickly.
+Use this library to pick files/directories quickly.
+
+## Features
+- Easy to import and use.
+- Highly customizable.
+- Support for both file and directory
+- Support for filtering
+- Support for managing file/directory (deleting, renaming) while picking.
+
+## Screenshots
 
 ![Sample3](doc/images/Sample1.jpg "Sample1")
 
@@ -25,7 +34,7 @@ repositories {
 ```
 2. Implementation
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.6'
+implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.7'
 ```
 
 ## Usage
@@ -61,7 +70,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.filledButton.setOnClickListener {
             materialYouFileExplorer.toExplorer(
-                this, binding.radioButtonFile.isChecked, "Custom Title"
+                this,
+                binding.radioButtonFile.isChecked,
+                if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default",
+                ArrayList(binding.textInputEditTextFilter.text.toString().split(",")),
+                binding.checkBoxFilterWhitelist.isChecked
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }
@@ -72,3 +85,5 @@ class MainActivity : AppCompatActivity() {
 - [libsu](https://github.com/topjohnwu/libsu)
 - [PermissionX](https://github.com/guolindev/PermissionX)
 - [MaterialFiles](https://github.com/zhanghai/MaterialFiles)
+- [Coil](https://github.com/coil-kt/coil)
+- [ActivityResultLauncher](https://github.com/DylanCaiCoding/ActivityResultLauncher)
