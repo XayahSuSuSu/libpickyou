@@ -4,4 +4,9 @@
     <string name="choose_path">Choose path</string>
     <string name="file">File</string>
     <string name="directory">Directory</string>
+    <string name="title">Title</string>
+    <string name="custom_title">Custom title</string>
+    <string name="filterWhitelist">Filter Whitelist</string>
+    <string name="filter">Filter</string>
+    <string name="filter_list" translatable="false">txt,mp4</string>
 </resources>
