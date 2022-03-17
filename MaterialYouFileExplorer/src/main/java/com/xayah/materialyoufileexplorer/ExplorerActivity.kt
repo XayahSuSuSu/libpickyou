@@ -52,7 +52,8 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (model.getPath() == "") {
+        val path = model.getPath()
+        if (!rootAccess && path == "/storage/emulated/0" || path == "") {
             super.onBackPressed()
         } else {
             model.removePath()
@@ -64,6 +65,7 @@ class ExplorerActivity : AppCompatActivity() {
         val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
         val hasFilter = suffixFilter != null
         val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
+        rootAccess = SuFile.open("/dev/console").canRead()
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)
@@ -83,7 +85,7 @@ class ExplorerActivity : AppCompatActivity() {
             if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
                     .contains("/storage/emulated/0/Android")
             ) {
-                if (Shell.rootAccess()) {
+                if (rootAccess) {
                     val rootFile = SuFile.open(model.getPath())
                     if (rootFile.exists()) {
                         try {
@@ -225,5 +227,9 @@ class ExplorerActivity : AppCompatActivity() {
             ).request { _, _, _ ->
             }
         }
+    }
+
+    companion object {
+        var rootAccess = false
     }
 }
