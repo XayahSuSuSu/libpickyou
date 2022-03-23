@@ -10,10 +10,13 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.WindowCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,6 +27,7 @@ import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
 import com.xayah.materialyoufileexplorer.util.PathUtil
+import com.xayah.materialyoufileexplorer.util.UriUtil
 import java.io.File
 import java.io.IOException
 import java.nio.file.*
@@ -31,10 +35,12 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.extension
 
+
 class ExplorerActivity : AppCompatActivity() {
     lateinit var binding: ActivityExplorerBinding
     lateinit var adapter: FileListAdapter
     val model: ExplorerViewModel by viewModels()
+    lateinit var openDocumentTreeLauncher: ActivityResultLauncher<Uri>
 
     init {
         Shell.enableVerboseLogging = BuildConfig.DEBUG
@@ -104,8 +110,9 @@ class ExplorerActivity : AppCompatActivity() {
                         val list = file.listFiles()!!
                         for (i in list) {
                             if (i.isFile) {
-                                if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist)
-                                    model.files.add(FileInfo(i.name, false))
+                                if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist) model.files.add(
+                                    FileInfo(i.name, false)
+                                )
                             } else {
                                 model.folders.add(FileInfo(i.name, true))
                             }
@@ -114,7 +121,126 @@ class ExplorerActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
                 }
-            }, {}, {}, {
+            }, {
+                if (Shell.rootAccess()) {
+                    val rootFile = SuFile.open(pathStr)
+                    if (rootFile.exists()) {
+                        try {
+                            val list = rootFile.listFiles()!!
+                            for (i in list) {
+                                if (i.isFile) {
+                                    if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist)
+                                        model.files.add(FileInfo(i.name, false))
+                                } else {
+                                    model.folders.add(FileInfo(i.name, true))
+                                }
+                            }
+                        } catch (e: NullPointerException) {
+                            e.printStackTrace()
+                        }
+                    }
+                } else {
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+                        if (!DocumentFile.fromTreeUri(
+                                this,
+                                UriUtil.DOCUMENT_URI_ANDROID_DATA_ACCESS
+                            )!!.canRead()
+                        ) {
+                            openDocumentTreeLauncher.launch(UriUtil.DOCUMENT_URI_ANDROID_DATA)
+                        }
+                        val documentFile =
+                            if (pathStr == PathUtil.STORAGE_EMULATED_0_ANDROID_DATA) {
+                                DocumentFile.fromTreeUri(
+                                    this,
+                                    UriUtil.DOCUMENT_URI_ANDROID_DATA_ACCESS
+                                )
+                            } else {
+                                model.documentFileList.last()
+                            }
+                        if (documentFile != null) {
+                            if (documentFile.exists()) {
+                                try {
+                                    val list = documentFile.listFiles()
+                                    for (i in list) {
+                                        if (i.isFile) {
+                                            if (!hasFilter || suffixFilter?.contains(
+                                                    i.name!!.split(".").last()
+                                                ) == filterWhitelist
+                                            )
+                                                model.files.add(
+                                                    FileInfo(i.name ?: "", false, i)
+                                                )
+                                        } else {
+                                            model.folders.add(FileInfo(i.name ?: "", true, i))
+                                        }
+                                    }
+                                } catch (e: NullPointerException) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                    }
+                }
+            }, {
+                if (Shell.rootAccess()) {
+                    val rootFile = SuFile.open(pathStr)
+                    if (rootFile.exists()) {
+                        try {
+                            val list = rootFile.listFiles()!!
+                            for (i in list) {
+                                if (i.isFile) {
+                                    if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist)
+                                        model.files.add(FileInfo(i.name, false))
+                                } else {
+                                    model.folders.add(FileInfo(i.name, true))
+                                }
+                            }
+                        } catch (e: NullPointerException) {
+                            e.printStackTrace()
+                        }
+                    }
+                } else {
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+                        if (!DocumentFile.fromTreeUri(
+                                this,
+                                UriUtil.DOCUMENT_URI_ANDROID_OBB_ACCESS
+                            )!!.canRead()
+                        ) {
+                            openDocumentTreeLauncher.launch(UriUtil.DOCUMENT_URI_ANDROID_OBB)
+                        }
+                        val documentFile = if (pathStr == PathUtil.STORAGE_EMULATED_0_ANDROID_OBB) {
+                            DocumentFile.fromTreeUri(
+                                this,
+                                UriUtil.DOCUMENT_URI_ANDROID_OBB_ACCESS
+                            )
+                        } else {
+                            model.documentFileList.last()
+                        }
+                        if (documentFile != null) {
+                            if (documentFile.exists()) {
+                                try {
+                                    val list = documentFile.listFiles()
+                                    for (i in list) {
+                                        if (i.isFile) {
+                                            if (!hasFilter || suffixFilter?.contains(
+                                                    i.name!!.split(".").last()
+                                                ) == filterWhitelist
+                                            )
+                                                model.files.add(
+                                                    FileInfo(i.name ?: "", false, i)
+                                                )
+                                        } else {
+                                            model.folders.add(FileInfo(i.name ?: "", true, i))
+                                        }
+                                    }
+                                } catch (e: NullPointerException) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                    }
+                }
+            }, {
                 try {
                     Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
                         @Throws(IOException::class)
@@ -221,6 +347,9 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        openDocumentTreeLauncher = registerForActivityResult(
+            ActivityResultContracts.OpenDocumentTree(), this::onOpenDocumentTreeResult
+        )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             PermissionX.init(this).permissions(
                 Manifest.permission.MANAGE_EXTERNAL_STORAGE,
@@ -237,6 +366,16 @@ class ExplorerActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
             ).request { _, _, _ ->
             }
+        }
+    }
+
+    private fun onOpenDocumentTreeResult(result: Uri?) {
+        if (result != null) {
+            contentResolver.takePersistableUriPermission(
+                result,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            model.refreshPath()
         }
     }
 }

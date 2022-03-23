@@ -16,6 +16,7 @@ class PathUtil {
             if (!Shell.rootAccess() && path == STORAGE_EMULATED_0 || path == "") {
                 activity.finish()
             } else {
+                model.documentFileList.removeLast()
                 model.removePath()
             }
         }
@@ -31,7 +32,13 @@ class PathUtil {
             if (!path.contains(STORAGE_EMULATED_0)) {
                 onOutEvent(path)
             } else {
-                when (path) {
+                var mPath = path
+                if (path.contains(STORAGE_EMULATED_0_ANDROID_DATA)) {
+                    mPath = STORAGE_EMULATED_0_ANDROID_DATA
+                } else if (path.contains(STORAGE_EMULATED_0_ANDROID_OBB)) {
+                    mPath = STORAGE_EMULATED_0_ANDROID_OBB
+                }
+                when (mPath) {
                     STORAGE_EMULATED_0_ANDROID -> {
                         onAndroidEvent(path)
                     }

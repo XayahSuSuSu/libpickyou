@@ -1,5 +1,6 @@
 package com.xayah.materialyoufileexplorer
 
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.xayah.materialyoufileexplorer.model.FileInfo
@@ -10,6 +11,8 @@ class ExplorerViewModel : ViewModel() {
     var fileList: MutableList<FileInfo> = mutableListOf()
     val folders = mutableListOf<FileInfo>()
     val files = mutableListOf<FileInfo>()
+
+    var documentFileList = mutableListOf<DocumentFile?>()
 
     fun getPath(): String {
         return pathList.value?.joinToString(separator = "/") ?: ""
