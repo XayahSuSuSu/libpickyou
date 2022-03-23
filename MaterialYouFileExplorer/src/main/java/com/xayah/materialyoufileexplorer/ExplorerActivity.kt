@@ -54,7 +54,7 @@ class ExplorerActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val path = model.getPath()
-        if (!rootAccess && path == PathUtil.STORAGE_EMULATED_0 || path == "") {
+        if (!Shell.rootAccess() && path == PathUtil.STORAGE_EMULATED_0 || path == "") {
             super.onBackPressed()
         } else {
             model.removePath()
@@ -66,7 +66,6 @@ class ExplorerActivity : AppCompatActivity() {
         val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
         val hasFilter = suffixFilter != null
         val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
-        rootAccess = SuFile.open("/dev/console").canRead()
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)
@@ -86,7 +85,7 @@ class ExplorerActivity : AppCompatActivity() {
             if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
                     .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
             ) {
-                if (rootAccess) {
+                if (Shell.rootAccess()) {
                     val rootFile = SuFile.open(model.getPath())
                     if (rootFile.exists()) {
                         try {
@@ -94,7 +93,7 @@ class ExplorerActivity : AppCompatActivity() {
                             for (i in list) {
                                 if (i.isFile) {
                                     if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist)
-                                            model.files.add(FileInfo(i.name, false))
+                                        model.files.add(FileInfo(i.name, false))
                                 } else {
                                     model.folders.add(FileInfo(i.name, true))
                                 }
@@ -228,9 +227,5 @@ class ExplorerActivity : AppCompatActivity() {
             ).request { _, _, _ ->
             }
         }
-    }
-
-    companion object {
-        var rootAccess = false
     }
 }

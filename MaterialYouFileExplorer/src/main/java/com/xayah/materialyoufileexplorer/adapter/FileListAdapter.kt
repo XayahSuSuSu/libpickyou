@@ -17,8 +17,8 @@ import coil.clear
 import coil.decode.VideoFrameDecoder
 import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
-import com.xayah.materialyoufileexplorer.ExplorerActivity
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
@@ -169,7 +169,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                             if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
                                     .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
                             ) {
-                                if (ExplorerActivity.rootAccess) {
+                                if (Shell.rootAccess()) {
                                     val file = SuFile(filePath)
                                     file.deleteRecursive()
                                     model.refreshPath()
@@ -197,7 +197,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                             if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
                                     .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
                             ) {
-                                if (ExplorerActivity.rootAccess) {
+                                if (Shell.rootAccess()) {
                                     val file = SuFile(filePath)
                                     val newFile = SuFile(newFilePath)
                                     file.renameTo(newFile)
