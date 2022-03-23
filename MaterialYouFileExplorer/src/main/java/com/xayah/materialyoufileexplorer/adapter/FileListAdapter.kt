@@ -166,19 +166,21 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                         .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
                         .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
                             val filePath = "${model.getPath()}/${fileInfo.name}"
-                            if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
-                                    .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
-                            ) {
+                            PathUtil.handleSpecialPath(model.getPath(), {
                                 if (Shell.rootAccess()) {
                                     val file = SuFile(filePath)
                                     file.deleteRecursive()
                                     model.refreshPath()
                                 }
-                            } else {
+                            }, {
                                 val file = File(filePath)
                                 file.deleteRecursively()
                                 model.refreshPath()
-                            }
+                            }, {}, {}, {
+                                val file = File(filePath)
+                                file.deleteRecursively()
+                                model.refreshPath()
+                            })
                         }.show()
                 }
                 R.id.menu_rename -> {
@@ -194,21 +196,24 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                             val filePath = "${model.getPath()}/${fileInfo.name}"
                             val newFilePath =
                                 "${model.getPath()}/${bindingDialogTextField.textField.text}"
-                            if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
-                                    .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
-                            ) {
+                            PathUtil.handleSpecialPath(model.getPath(), {
                                 if (Shell.rootAccess()) {
                                     val file = SuFile(filePath)
                                     val newFile = SuFile(newFilePath)
                                     file.renameTo(newFile)
                                     model.refreshPath()
                                 }
-                            } else {
+                            }, {
                                 val file = File(filePath)
                                 val newFile = File(newFilePath)
                                 file.renameTo(newFile)
                                 model.refreshPath()
-                            }
+                            }, {}, {}, {
+                                val file = File(filePath)
+                                val newFile = File(newFilePath)
+                                file.renameTo(newFile)
+                                model.refreshPath()
+                            })
                         }
                         .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
                         .show()

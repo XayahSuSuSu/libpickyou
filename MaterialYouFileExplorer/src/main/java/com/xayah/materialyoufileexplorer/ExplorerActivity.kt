@@ -24,6 +24,7 @@ import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
 import com.xayah.materialyoufileexplorer.util.PathUtil
+import java.io.File
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
@@ -77,10 +78,7 @@ class ExplorerActivity : AppCompatActivity() {
             model.files.clear()
             if (pathStr != "")
                 model.folders.add(FileInfo("..", true))
-
-            if (!pathStr.contains(PathUtil.STORAGE_EMULATED_0) or pathStr
-                    .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
-            ) {
+            PathUtil.handleSpecialPath(pathStr, {
                 if (Shell.rootAccess()) {
                     val rootFile = SuFile.open(pathStr)
                     if (rootFile.exists()) {
@@ -99,7 +97,24 @@ class ExplorerActivity : AppCompatActivity() {
                         }
                     }
                 }
-            } else {
+            }, {
+                val file = File(pathStr)
+                if (file.exists()) {
+                    try {
+                        val list = file.listFiles()!!
+                        for (i in list) {
+                            if (i.isFile) {
+                                if (!hasFilter || suffixFilter?.contains(i.extension) == filterWhitelist)
+                                    model.files.add(FileInfo(i.name, false))
+                            } else {
+                                model.folders.add(FileInfo(i.name, true))
+                            }
+                        }
+                    } catch (e: NullPointerException) {
+                        e.printStackTrace()
+                    }
+                }
+            }, {}, {}, {
                 try {
                     Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
                         @Throws(IOException::class)
@@ -142,7 +157,7 @@ class ExplorerActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }
+            })
 
             model.fileList = (model.folders + model.files) as MutableList<FileInfo>
             binding.topAppBar.subtitle =
