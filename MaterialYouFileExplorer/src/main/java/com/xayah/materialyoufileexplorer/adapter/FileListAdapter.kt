@@ -94,7 +94,7 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
 
             if (current.isDir) {
                 if (current.name == "..") {
-                    model.removePath()
+                    PathUtil.onBack(model, activity)
                 } else {
                     model.addPath(dirName.toString())
                 }

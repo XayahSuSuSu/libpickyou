@@ -53,12 +53,7 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val path = model.getPath()
-        if (!Shell.rootAccess() && path == PathUtil.STORAGE_EMULATED_0 || path == "") {
-            super.onBackPressed()
-        } else {
-            model.removePath()
-        }
+        PathUtil.onBack(model, this)
     }
 
     private fun binding() {
@@ -76,17 +71,18 @@ class ExplorerActivity : AppCompatActivity() {
         binding.topAppBar.setNavigationOnClickListener { finish() }
 
         model.pathList.observe(this) {
-            val path = Paths.get(model.getPath())
+            val pathStr = model.getPath()
+            val path = Paths.get(pathStr)
             model.folders.clear()
             model.files.clear()
-            if (model.getPath() != "")
+            if (pathStr != "")
                 model.folders.add(FileInfo("..", true))
 
-            if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
+            if (!pathStr.contains(PathUtil.STORAGE_EMULATED_0) or pathStr
                     .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
             ) {
                 if (Shell.rootAccess()) {
-                    val rootFile = SuFile.open(model.getPath())
+                    val rootFile = SuFile.open(pathStr)
                     if (rootFile.exists()) {
                         try {
                             val list = rootFile.listFiles()!!
@@ -150,7 +146,7 @@ class ExplorerActivity : AppCompatActivity() {
 
             model.fileList = (model.folders + model.files) as MutableList<FileInfo>
             binding.topAppBar.subtitle =
-                "${if (model.getPath() != "") model.folders.size - 1 else model.folders.size} ${
+                "${if (pathStr != "") model.folders.size - 1 else model.folders.size} ${
                     getString(
                         R.string.folders
                     )
