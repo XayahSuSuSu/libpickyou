@@ -34,7 +34,7 @@ repositories {
 ```
 2. Implementation
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.7'
+implementation 'io.github.xayahsususu:materialyoufileexplorer:1.0.8'
 ```
 
 ## Usage
