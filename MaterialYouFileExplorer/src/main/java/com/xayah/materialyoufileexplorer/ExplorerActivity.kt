@@ -23,6 +23,7 @@ import com.topjohnwu.superuser.io.SuFile
 import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
+import com.xayah.materialyoufileexplorer.util.PathUtil
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
@@ -53,7 +54,7 @@ class ExplorerActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val path = model.getPath()
-        if (!rootAccess && path == "/storage/emulated/0" || path == "") {
+        if (!rootAccess && path == PathUtil.STORAGE_EMULATED_0 || path == "") {
             super.onBackPressed()
         } else {
             model.removePath()
@@ -82,8 +83,8 @@ class ExplorerActivity : AppCompatActivity() {
             if (model.getPath() != "")
                 model.folders.add(FileInfo("..", true))
 
-            if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
-                    .contains("/storage/emulated/0/Android")
+            if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
+                    .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
             ) {
                 if (rootAccess) {
                     val rootFile = SuFile.open(model.getPath())

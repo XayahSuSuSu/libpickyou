@@ -25,6 +25,7 @@ import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.AdapterFileBinding
 import com.xayah.materialyoufileexplorer.databinding.DialogTextFieldBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
+import com.xayah.materialyoufileexplorer.util.PathUtil
 import java.io.File
 
 
@@ -165,8 +166,8 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                         .setNegativeButton(mContext.getString(R.string.cancel)) { _, _ -> }
                         .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
                             val filePath = "${model.getPath()}/${fileInfo.name}"
-                            if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
-                                    .contains("/storage/emulated/0/Android")
+                            if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
+                                    .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
                             ) {
                                 if (ExplorerActivity.rootAccess) {
                                     val file = SuFile(filePath)
@@ -193,8 +194,8 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                             val filePath = "${model.getPath()}/${fileInfo.name}"
                             val newFilePath =
                                 "${model.getPath()}/${bindingDialogTextField.textField.text}"
-                            if (!model.getPath().contains("/storage/emulated/0") or model.getPath()
-                                    .contains("/storage/emulated/0/Android")
+                            if (!model.getPath().contains(PathUtil.STORAGE_EMULATED_0) or model.getPath()
+                                    .contains(PathUtil.STORAGE_EMULATED_0_ANDROID)
                             ) {
                                 if (ExplorerActivity.rootAccess) {
                                     val file = SuFile(filePath)
