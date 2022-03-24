@@ -68,6 +68,7 @@ class ExplorerActivity : AppCompatActivity() {
         val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
         val hasFilter = suffixFilter != null
         val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
+        rootAccess = SuFile.open("/dev/console").canRead()
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)
@@ -85,7 +86,7 @@ class ExplorerActivity : AppCompatActivity() {
             if (pathStr != "")
                 model.folders.add(FileInfo("..", true))
             PathUtil.handleSpecialPath(pathStr, {
-                if (Shell.rootAccess()) {
+                if (rootAccess) {
                     val rootFile = SuFile.open(pathStr)
                     if (rootFile.exists()) {
                         try {
@@ -122,7 +123,7 @@ class ExplorerActivity : AppCompatActivity() {
                     }
                 }
             }, {
-                if (Shell.rootAccess()) {
+                if (rootAccess) {
                     val rootFile = SuFile.open(pathStr)
                     if (rootFile.exists()) {
                         try {
@@ -182,7 +183,7 @@ class ExplorerActivity : AppCompatActivity() {
                     }
                 }
             }, {
-                if (Shell.rootAccess()) {
+                if (rootAccess) {
                     val rootFile = SuFile.open(pathStr)
                     if (rootFile.exists()) {
                         try {
@@ -377,5 +378,9 @@ class ExplorerActivity : AppCompatActivity() {
             )
             model.refreshPath()
         }
+    }
+
+    companion object {
+        var rootAccess = false
     }
 }
