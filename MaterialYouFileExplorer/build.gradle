@@ -79,7 +79,7 @@ ext {
     PUBLISH_ARTIFACT_ID = 'materialyoufileexplorer'
     PUBLISH_DESCRIPTION = 'A file explorer with the style of Material You.'
     PUBLISH_GITHUB_URL = 'https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer'
-    PUBLISH_VERSION = '1.0.8'
+    PUBLISH_VERSION = '1.0.9'
     PUBLISH_LICENSE_NAME = 'GPL-3.0'
     PUBLISH_LICENSE_URL = 'https://choosealicense.com/licenses/gpl-3.0/'
     PUBLISH_DE_URL = 'https://choosealicense.com/licenses/gpl-3.0/'
