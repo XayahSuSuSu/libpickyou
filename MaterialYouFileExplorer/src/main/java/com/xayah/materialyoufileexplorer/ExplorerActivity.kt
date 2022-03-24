@@ -68,7 +68,6 @@ class ExplorerActivity : AppCompatActivity() {
         val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
         val hasFilter = suffixFilter != null
         val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
-        rootAccess = SuFile.open("/dev/console").canRead()
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)
@@ -381,6 +380,8 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     companion object {
-        var rootAccess = false
+        val rootAccess by lazy {
+            SuFile.open("/dev/console").canRead()
+        }
     }
 }
