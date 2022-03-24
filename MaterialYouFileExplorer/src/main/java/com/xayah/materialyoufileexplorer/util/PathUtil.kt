@@ -1,5 +1,6 @@
 package com.xayah.materialyoufileexplorer.util
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.superuser.Shell
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
@@ -16,7 +17,9 @@ class PathUtil {
             if (!Shell.rootAccess() && path == STORAGE_EMULATED_0 || path == "") {
                 activity.finish()
             } else {
-                model.documentFileList.removeLast()
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+                    model.documentFileList.removeLast()
+                }
                 model.removePath()
             }
         }
