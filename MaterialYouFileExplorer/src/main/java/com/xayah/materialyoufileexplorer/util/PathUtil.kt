@@ -18,7 +18,7 @@ class PathUtil {
                 activity.finish()
             } else {
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
-                    model.documentFileList.removeLast()
+                    model.documentFileList.removeLastOrNull()
                 }
                 model.removePath()
             }

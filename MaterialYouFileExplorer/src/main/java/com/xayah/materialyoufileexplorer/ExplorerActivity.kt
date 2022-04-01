@@ -155,7 +155,7 @@ class ExplorerActivity : AppCompatActivity() {
                                     UriUtil.DOCUMENT_URI_ANDROID_DATA_ACCESS
                                 )
                             } else {
-                                model.documentFileList.last()
+                                model.documentFileList.lastOrNull()
                             }
                         if (documentFile != null) {
                             if (documentFile.exists()) {
@@ -214,7 +214,7 @@ class ExplorerActivity : AppCompatActivity() {
                                 UriUtil.DOCUMENT_URI_ANDROID_OBB_ACCESS
                             )
                         } else {
-                            model.documentFileList.last()
+                            model.documentFileList.lastOrNull()
                         }
                         if (documentFile != null) {
                             if (documentFile.exists()) {
