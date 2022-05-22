@@ -11,8 +11,7 @@
     <application android:requestLegacyExternalStorage="true">
         <activity
             android:name=".ExplorerActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MaterialYouFileExplorer" />
+            android:exported="false" />
     </application>
 
 </manifest>
