@@ -33,6 +33,7 @@ android {
         jvmTarget = '1.8'
     }
     buildToolsVersion '32.0.0'
+    namespace 'com.xayah.materialyoufileexplorer'
 }
 
 dependencies {
