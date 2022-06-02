@@ -21,16 +21,16 @@
 ![Sample3](doc/images/Sample3.jpg "Sample3")
 
 ## 引入
-1. 在 `settings.gradle` 中开启 `mavenCentral()`
+1. 在 `settings.gradle` 中开启 `maven { url 'https://jitpack.io' }`
 ```
 repositories {
         ......
-        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 ```
 2. 引入MaterialYouFileExplorer
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.1.1'
+implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.2.0'
 ```
 
 ## 使用

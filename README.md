@@ -25,16 +25,16 @@ Use this library to pick files/directories quickly.
 ![Sample3](doc/images/Sample3.jpg "Sample3")
 
 ## Implementation
-1. Enable `mavenCentral()` in `settings.gradle`
+1. Enable `maven { url 'https://jitpack.io' }` in `settings.gradle`
 ```
 repositories {
         ......
-        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 ```
 2. Implementation
 ```
-implementation 'io.github.xayahsususu:materialyoufileexplorer:1.1.1'
+implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.2.0'
 ```
 
 ## Usage
