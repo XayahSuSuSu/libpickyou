@@ -32,6 +32,8 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
+import java.text.Collator
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.extension
 
@@ -82,8 +84,6 @@ class ExplorerActivity : AppCompatActivity() {
             val path = Paths.get(pathStr)
             model.folders.clear()
             model.files.clear()
-            if (pathStr != "")
-                model.folders.add(FileInfo("..", true))
             PathUtil.handleSpecialPath(pathStr, {
                 if (rootAccess) {
                     val rootFile = SuFile.open(pathStr)
@@ -284,8 +284,24 @@ class ExplorerActivity : AppCompatActivity() {
                     e.printStackTrace()
                 }
             })
-
-            model.fileList = (model.folders + model.files) as MutableList<FileInfo>
+            model.folders.apply {
+                sortWith { fileInfo1, fileInfo2 ->
+                    val collator = Collator.getInstance(Locale.CHINA)
+                    collator.getCollationKey((fileInfo1 as FileInfo).name)
+                        .compareTo(collator.getCollationKey((fileInfo2 as FileInfo).name))
+                }
+            }
+            model.files.apply {
+                sortWith { fileInfo1, fileInfo2 ->
+                    val collator = Collator.getInstance(Locale.CHINA)
+                    collator.getCollationKey((fileInfo1 as FileInfo).name)
+                        .compareTo(collator.getCollationKey((fileInfo2 as FileInfo).name))
+                }
+            }
+            model.fileList = ((model.folders + model.files) as MutableList<FileInfo>).apply {
+                if (pathStr != "")
+                    add(0, FileInfo("..", true))
+            }
             binding.topAppBar.subtitle =
                 "${if (pathStr != "") model.folders.size - 1 else model.folders.size} ${
                     getString(
