@@ -74,23 +74,3 @@ dependencies {
     implementation "io.coil-kt:coil-svg:$coil_version"
     implementation "io.coil-kt:coil-video:$coil_version"
 }
-
-ext {
-    PUBLISH_GROUP_ID = "io.github.xayahsususu"
-    PUBLISH_ARTIFACT_ID = 'materialyoufileexplorer'
-    PUBLISH_DESCRIPTION = 'A file explorer with the style of Material You.'
-    PUBLISH_GITHUB_URL = 'https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer'
-    PUBLISH_VERSION = '1.1.1'
-    PUBLISH_LICENSE_NAME = 'GPL-3.0'
-    PUBLISH_LICENSE_URL = 'https://choosealicense.com/licenses/gpl-3.0/'
-    PUBLISH_DE_URL = 'https://choosealicense.com/licenses/gpl-3.0/'
-    PUBLISH_DEVELOPER_ID = 'Xayah'
-    PUBLISH_DEVELOPER_NAME = 'Xayah'
-    PUBLISH_DEVELOPER_EMAIL = 'zds1249475336@gmail.com'
-    PUBLISH_CONNECTION = 'scm:git:github.com/XayahSuSuSu/Android-MaterialYouFileExplorer.git'
-    PUBLISH_CONNECTION_DEVELOPER = 'scm:git:ssh://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer.git'
-    PUBLISH_CONNECTION_URL = 'https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer/tree/main'
-    PUBLISH_MAVEN_NAME = "MaterialYouFileExplorer"
-
-}
-apply from: "${rootProject.projectDir}/publish-mavencentral.gradle"
