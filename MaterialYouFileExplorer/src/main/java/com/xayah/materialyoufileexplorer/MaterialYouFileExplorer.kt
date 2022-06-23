@@ -10,6 +10,11 @@ import com.xayah.materialyoufileexplorer.util.PathUtil
 
 class MaterialYouFileExplorer {
     private lateinit var startActivityLauncher: StartActivityLauncher
+    var isFile: Boolean = true
+    var title: String = "default"
+    var suffixFilter: ArrayList<String>? = null
+    var filterWhitelist: Boolean = true
+    var defPath: String = PathUtil.STORAGE_EMULATED_0
 
     fun initialize(activity: ComponentActivity) {
         startActivityLauncher = StartActivityLauncher(activity)
@@ -19,15 +24,7 @@ class MaterialYouFileExplorer {
         startActivityLauncher = StartActivityLauncher(fragment)
     }
 
-    fun toExplorer(
-        context: Context,
-        isFile: Boolean,
-        title: String = "default",
-        suffixFilter: ArrayList<String>? = null,
-        filterWhitelist: Boolean = true,
-        defPath: String = PathUtil.STORAGE_EMULATED_0,
-        callback: (path: String, isFile: Boolean) -> Unit
-    ) {
+    fun toExplorer(context: Context, callback: (path: String, isFile: Boolean) -> Unit) {
         val intent = Intent(
             context,
             ExplorerActivity::class.java

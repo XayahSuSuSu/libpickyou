@@ -13,18 +13,25 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val materialYouFileExplorer = MaterialYouFileExplorer()
-        materialYouFileExplorer.initialize(this)
+        val materialYouFileExplorer = MaterialYouFileExplorer().apply {
+            initialize(this@MainActivity)
+        }
 
         binding.filledButton.setOnClickListener {
-            materialYouFileExplorer.toExplorer(
-                this,
-                binding.radioButtonFile.isChecked,
-                if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default",
-                ArrayList(binding.textInputEditTextFilter.text.toString().split(",")),
-                binding.checkBoxFilterWhitelist.isChecked,
-                "/storage/emulated/0/Download"
-            ) { path, _ -> binding.textInputEditText.setText(path) }
+            materialYouFileExplorer.apply {
+                isFile = binding.radioButtonFile.isChecked
+                title =
+                    if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default"
+                suffixFilter = ArrayList(binding.textInputEditTextFilter.text.toString().split(","))
+                filterWhitelist = binding.checkBoxFilterWhitelist.isChecked
+                defPath = "/storage/emulated/0/Download"
+
+                toExplorer(it.context) { path, _ ->
+                    binding.textInputEditText.setText(
+                        path
+                    )
+                }
+            }
         }
     }
 }

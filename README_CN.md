@@ -36,20 +36,19 @@ implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.2.1'
 ## 使用
 1. 在 `onCreate()` 中初始化
 ```
-val materialYouFileExplorer = MaterialYouFileExplorer()
-materialYouFileExplorer.initialize(this)
+val materialYouFileExplorer = MaterialYouFileExplorer().apply {
+    initialize(this@MainActivity)
+}
 ```
 2. 打开Explorer Activity并且处理回调
 ```
-materialYouFileExplorer.toExplorer(this, isFile) { path, isFile -> 
+materialYouFileExplorer.toExplorer(context) { path, isFile -> 
     // Code here
 }
 ```
 #### 自定义标题
 ```
-materialYouFileExplorer.toExplorer(this, isFile, "Custom Title") { path, isFile -> 
-    // Code here
-}
+materialYouFileExplorer.title = "Custom Title"
 ```
 
 
@@ -61,17 +60,25 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val materialYouFileExplorer = MaterialYouFileExplorer()
-        materialYouFileExplorer.initialize(this)
+        val materialYouFileExplorer = MaterialYouFileExplorer().apply {
+            initialize(this@MainActivity)
+        }
 
         binding.filledButton.setOnClickListener {
-            materialYouFileExplorer.toExplorer(
-                this,
-                binding.radioButtonFile.isChecked,
-                if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default",
-                ArrayList(binding.textInputEditTextFilter.text.toString().split(",")),
-                binding.checkBoxFilterWhitelist.isChecked
-            ) { path, _ -> binding.textInputEditText.setText(path) }
+            materialYouFileExplorer.apply {
+                isFile = binding.radioButtonFile.isChecked
+                title =
+                    if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default"
+                suffixFilter = ArrayList(binding.textInputEditTextFilter.text.toString().split(","))
+                filterWhitelist = binding.checkBoxFilterWhitelist.isChecked
+                defPath = "/storage/emulated/0/Download"
+
+                toExplorer(it.context) { path, _ ->
+                    binding.textInputEditText.setText(
+                        path
+                    )
+                }
+            }
         }
     }
 }
