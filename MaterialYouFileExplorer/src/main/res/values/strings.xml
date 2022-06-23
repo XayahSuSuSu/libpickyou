@@ -12,4 +12,5 @@
     <string name="query_delete_file">Do you want to delete this file or directory?</string>
     <string name="rename">Rename</string>
     <string name="new_name">New Name</string>
+    <string name="def_path">Default path</string>
 </resources>

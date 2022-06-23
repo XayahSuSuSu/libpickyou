@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
@@ -365,6 +367,7 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        setSupportActionBar(binding.topAppBar)
         openDocumentTreeLauncher = registerForActivityResult(
             ActivityResultContracts.OpenDocumentTree(), this::onOpenDocumentTreeResult
         )
@@ -394,6 +397,22 @@ class ExplorerActivity : AppCompatActivity() {
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
             model.refreshPath()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.def_path, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_def_path -> {
+                model.defPath = PathUtil.STORAGE_EMULATED_0
+                model.pathList.value = model.getDefPath()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
