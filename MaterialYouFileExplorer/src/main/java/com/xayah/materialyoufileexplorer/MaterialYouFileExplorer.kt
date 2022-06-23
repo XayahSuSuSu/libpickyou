@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
 import com.dylanc.activityresult.launcher.StartActivityLauncher
+import com.xayah.materialyoufileexplorer.util.PathUtil
 
 class MaterialYouFileExplorer {
     private lateinit var startActivityLauncher: StartActivityLauncher
@@ -24,6 +25,7 @@ class MaterialYouFileExplorer {
         title: String = "default",
         suffixFilter: ArrayList<String>? = null,
         filterWhitelist: Boolean = true,
+        defPath: String = PathUtil.STORAGE_EMULATED_0,
         callback: (path: String, isFile: Boolean) -> Unit
     ) {
         val intent = Intent(
@@ -32,6 +34,7 @@ class MaterialYouFileExplorer {
         ).putExtra("isFile", isFile).putExtra("title", title)
             .putStringArrayListExtra("suffixFilter", suffixFilter)
             .putExtra("filterWhitelist", filterWhitelist)
+            .putExtra("defPath", defPath)
         startActivityLauncher.launch(intent) { resultCode, data ->
             if (resultCode == RESULT_OK) {
                 callback(

@@ -22,7 +22,8 @@ class MainActivity : AppCompatActivity() {
                 binding.radioButtonFile.isChecked,
                 if (binding.checkBox.isChecked) binding.textInputEditTextTitle.text.toString() else "default",
                 ArrayList(binding.textInputEditTextFilter.text.toString().split(",")),
-                binding.checkBoxFilterWhitelist.isChecked
+                binding.checkBoxFilterWhitelist.isChecked,
+                "/storage/emulated/0/Download"
             ) { path, _ -> binding.textInputEditText.setText(path) }
         }
     }

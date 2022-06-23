@@ -70,6 +70,8 @@ class ExplorerActivity : AppCompatActivity() {
         val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
         val hasFilter = suffixFilter != null
         val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
+        model.defPath = intent.getStringExtra("defPath") ?: PathUtil.STORAGE_EMULATED_0
+        model.pathList.value = model.getDefPath()
 
         adapter = FileListAdapter(this, model)
         adapter.bind(binding)

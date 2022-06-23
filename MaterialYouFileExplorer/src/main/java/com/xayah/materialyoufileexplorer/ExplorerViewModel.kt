@@ -4,10 +4,11 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.xayah.materialyoufileexplorer.model.FileInfo
+import com.xayah.materialyoufileexplorer.util.PathUtil
 
 class ExplorerViewModel : ViewModel() {
-    var pathList =
-        MutableLiveData(mutableListOf("", "storage", "emulated", "0"))
+    var defPath = PathUtil.STORAGE_EMULATED_0
+    var pathList = MutableLiveData(getDefPath())
     var fileList: MutableList<FileInfo> = mutableListOf()
     val folders = mutableListOf<FileInfo>()
     val files = mutableListOf<FileInfo>()
@@ -19,24 +20,24 @@ class ExplorerViewModel : ViewModel() {
     }
 
     fun getPath(name: String): String {
-        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        val newPath = pathList.value ?: getDefPath()
         return newPath.joinToString(separator = "/") + "/" + name
     }
 
     fun addPath(path: String) {
-        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        val newPath = pathList.value ?: getDefPath()
         newPath.add(path)
         pathList.value = newPath
     }
 
     fun removePath() {
-        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        val newPath = pathList.value ?: getDefPath()
         newPath.removeLast()
         pathList.value = newPath
     }
 
     fun returnPath(index: Int) {
-        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        val newPath = pathList.value ?: getDefPath()
         for (i in 1 until newPath.size - index) {
             newPath.removeLast()
         }
@@ -44,7 +45,11 @@ class ExplorerViewModel : ViewModel() {
     }
 
     fun refreshPath() {
-        val newPath = pathList.value ?: mutableListOf("", "storage", "emulated", "0")
+        val newPath = pathList.value ?: getDefPath()
         pathList.value = newPath
+    }
+
+    fun getDefPath(): MutableList<String> {
+        return defPath.split("/").toMutableList()
     }
 }
