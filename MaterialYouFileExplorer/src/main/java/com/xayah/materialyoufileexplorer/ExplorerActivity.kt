@@ -81,7 +81,6 @@ class ExplorerActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
-        binding.topAppBar.setNavigationOnClickListener { finish() }
 
         model.pathList.observe(this) {
             val pathStr = model.getPath()
@@ -412,7 +411,13 @@ class ExplorerActivity : AppCompatActivity() {
                 model.pathList.value = model.getDefPath()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
         }
     }
 
