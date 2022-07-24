@@ -6,7 +6,7 @@
     <string name="confirm">确定</string>
     <string name="query_dir">是否选择该文件夹？</string>
     <string name="query_file">是否选择该文件？</string>
-    <string name="choose_file" >选择文件</string>
+    <string name="choose_file">选择文件</string>
     <string name="folders">个文件夹</string>
     <string name="files">个文件</string>
     <string name="delete">删除</string>
@@ -14,4 +14,10 @@
     <string name="rename">重命名</string>
     <string name="new_name">新名称</string>
     <string name="def_path">默认路径</string>
+    <string name="create">创建</string>
+    <string name="name">名称</string>
+    <string name="file">文件</string>
+    <string name="directory">文件夹</string>
+    <string name="success">成功</string>
+    <string name="failed">失败</string>
 </resources>

@@ -16,7 +16,7 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/def_path"
+                app:menu="@menu/top_bar"
                 app:navigationIcon="@drawable/ic_round_arrow_back" />
 
             <HorizontalScrollView
