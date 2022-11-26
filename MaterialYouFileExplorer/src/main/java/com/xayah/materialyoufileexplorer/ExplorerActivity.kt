@@ -47,7 +47,7 @@ class ExplorerActivity : AppCompatActivity() {
     lateinit var binding: ActivityExplorerBinding
     lateinit var adapter: FileListAdapter
     val model: ExplorerViewModel by viewModels()
-    lateinit var openDocumentTreeLauncher: ActivityResultLauncher<Uri>
+    lateinit var openDocumentTreeLauncher: ActivityResultLauncher<Uri?>
 
     init {
         Shell.enableVerboseLogging = BuildConfig.DEBUG
