@@ -495,7 +495,6 @@ class ExplorerActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 PathUtil.onBack(model, this@ExplorerActivity)
-                finish()
             }
         })
         openDocumentTreeLauncher = registerForActivityResult(
