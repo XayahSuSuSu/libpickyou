@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -86,10 +87,12 @@ class ExplorerActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding()
         init()
-    }
-
-    override fun onBackPressed() {
-        PathUtil.onBack(model, this)
+        onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                PathUtil.onBack(model, this@ExplorerActivity)
+                finish()
+            }
+        })
     }
 
     private fun binding() {
