@@ -16,7 +16,9 @@ class ExplorerViewModel : ViewModel() {
     var documentFileList = mutableListOf<DocumentFile?>()
 
     fun getPath(): String {
-        return pathList.value?.joinToString(separator = "/") ?: ""
+        var path = pathList.value?.joinToString(separator = "/") ?: ""
+        if (path == "") path = "/"
+        return path
     }
 
     fun getPath(name: String): String {
