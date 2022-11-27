@@ -52,6 +52,7 @@ class ExplorerActivity : AppCompatActivity() {
     lateinit var adapter: FileListAdapter
     val model: ExplorerViewModel by viewModels()
     lateinit var openDocumentTreeLauncher: ActivityResultLauncher<Uri?>
+    private var isFile = true
 
     companion object {
         init {
@@ -87,16 +88,10 @@ class ExplorerActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding()
         init()
-        onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                PathUtil.onBack(model, this@ExplorerActivity)
-                finish()
-            }
-        })
     }
 
     private fun binding() {
-        val isFile = intent.getBooleanExtra("isFile", false)
+        isFile = intent.getBooleanExtra("isFile", false)
         val suffixFilter = intent.getStringArrayListExtra("suffixFilter")
         val hasFilter = suffixFilter != null
         val filterWhitelist = intent.getBooleanExtra("filterWhitelist", true)
@@ -368,23 +363,113 @@ class ExplorerActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged()
         }
 
-        binding.floatingActionButton.setOnClickListener {
-            MaterialAlertDialogBuilder(this).setTitle(getString(R.string.tips))
-                .setMessage(getString(R.string.query_dir))
-                .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
-                .setPositiveButton(getString(R.string.confirm)) { _, _ ->
-                    val intent = Intent().apply {
-                        putExtra("path", model.getPath())
-                        putExtra("isFile", isFile)
+        binding.floatingActionButtonCreate.setOnClickListener {
+            DialogTextFieldBinding.inflate(layoutInflater).apply {
+                val that = this
+                that.textLayout.hint = context.getString(R.string.name)
+                MaterialAlertDialogBuilder(context).apply {
+                    setTitle(context.getString(R.string.create))
+                    setView(that.root)
+                    setCancelable(true)
+                    setPositiveButton(context.getString(R.string.file)) { _, _ ->
+                        val name = that.textField.text ?: ""
+                        val filePath =
+                            "${model.getPath()}/${name}"
+                        PathUtil.handleSpecialPath(model.getPath(), {
+                            if (rootAccess) {
+                                val file = ExtendedFile(filePath)
+                                if (file.createNewFile()) Toast.makeText(
+                                    context,
+                                    context.getString(R.string.success),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                else Toast.makeText(
+                                    context,
+                                    context.getString(R.string.failed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                model.refreshPath()
+                            }
+                        }, {
+                            val file = File(filePath)
+                            if (file.createNewFile()) Toast.makeText(
+                                context,
+                                context.getString(R.string.success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            else Toast.makeText(
+                                context,
+                                context.getString(R.string.failed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            model.refreshPath()
+                        }, {}, {}, {
+                            val file = File(filePath)
+                            if (file.createNewFile()) Toast.makeText(
+                                context,
+                                context.getString(R.string.success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            else Toast.makeText(
+                                context,
+                                context.getString(R.string.failed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            model.refreshPath()
+                        })
                     }
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                }.show()
+                    setNegativeButton(context.getString(R.string.directory)) { _, _ ->
+                        val name = that.textField.text ?: ""
+                        val dirPath =
+                            "${model.getPath()}/${name}"
+                        PathUtil.handleSpecialPath(model.getPath(), {
+                            if (rootAccess) {
+                                val file = ExtendedFile(dirPath)
+                                if (file.mkdirs()) Toast.makeText(
+                                    context,
+                                    context.getString(R.string.success),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                else Toast.makeText(
+                                    context,
+                                    context.getString(R.string.failed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                model.refreshPath()
+                            }
+                        }, {
+                            val file = File(dirPath)
+                            if (file.mkdirs()) Toast.makeText(
+                                context,
+                                context.getString(R.string.success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            else Toast.makeText(
+                                context,
+                                context.getString(R.string.failed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            model.refreshPath()
+                        }, {}, {}, {
+                            val file = File(dirPath)
+                            if (file.mkdirs()) Toast.makeText(
+                                context,
+                                context.getString(R.string.success),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            else Toast.makeText(
+                                context,
+                                context.getString(R.string.failed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            model.refreshPath()
+                        })
+                    }
+                    show()
+                }
+            }
         }
 
-        if (isFile) {
-            binding.floatingActionButton.visibility = View.GONE
-        }
         if (intent.getStringExtra("title") == "default") {
             binding.topAppBar.title =
                 if (isFile) getString(R.string.choose_file) else getString(R.string.choose_dir)
@@ -402,8 +487,17 @@ class ExplorerActivity : AppCompatActivity() {
         }
         RootService.bind(intent, remoteFileSystemConnection)
 
+        binding.topAppBar.setNavigationOnClickListener {
+            finish()
+        }
 
-        setSupportActionBar(binding.topAppBar)
+        setSupportActionBar(binding.bottomAppBar)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                PathUtil.onBack(model, this@ExplorerActivity)
+                finish()
+            }
+        })
         openDocumentTreeLauncher = registerForActivityResult(
             ActivityResultContracts.OpenDocumentTree(), this::onOpenDocumentTreeResult
         )
@@ -441,6 +535,14 @@ class ExplorerActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        if (isFile) {
+            val item = menu.findItem(R.id.menu_confirm)
+            item.isVisible = false
+        }
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_def_path -> {
@@ -448,116 +550,18 @@ class ExplorerActivity : AppCompatActivity() {
                 model.pathList.value = model.getDefPath()
                 true
             }
-            R.id.menu_create -> {
-                DialogTextFieldBinding.inflate(layoutInflater).apply {
-                    val that = this
-                    that.textLayout.hint = context.getString(R.string.name)
-                    MaterialAlertDialogBuilder(context).apply {
-                        setTitle(context.getString(R.string.create))
-                        setView(that.root)
-                        setCancelable(true)
-                        setPositiveButton(context.getString(R.string.file)) { _, _ ->
-                            val name = that.textField.text ?: ""
-                            val filePath =
-                                "${model.getPath()}/${name}"
-                            PathUtil.handleSpecialPath(model.getPath(), {
-                                if (rootAccess) {
-                                    val file = ExtendedFile(filePath)
-                                    if (file.createNewFile()) Toast.makeText(
-                                        context,
-                                        context.getString(R.string.success),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    else Toast.makeText(
-                                        context,
-                                        context.getString(R.string.failed),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    model.refreshPath()
-                                }
-                            }, {
-                                val file = File(filePath)
-                                if (file.createNewFile()) Toast.makeText(
-                                    context,
-                                    context.getString(R.string.success),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                else Toast.makeText(
-                                    context,
-                                    context.getString(R.string.failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                model.refreshPath()
-                            }, {}, {}, {
-                                val file = File(filePath)
-                                if (file.createNewFile()) Toast.makeText(
-                                    context,
-                                    context.getString(R.string.success),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                else Toast.makeText(
-                                    context,
-                                    context.getString(R.string.failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                model.refreshPath()
-                            })
+            R.id.menu_confirm -> {
+                MaterialAlertDialogBuilder(this).setTitle(getString(R.string.tips))
+                    .setMessage(getString(R.string.query_dir))
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+                    .setPositiveButton(getString(R.string.confirm)) { _, _ ->
+                        val intent = Intent().apply {
+                            putExtra("path", model.getPath())
+                            putExtra("isFile", isFile)
                         }
-                        setNegativeButton(context.getString(R.string.directory)) { _, _ ->
-                            val name = that.textField.text ?: ""
-                            val dirPath =
-                                "${model.getPath()}/${name}"
-                            PathUtil.handleSpecialPath(model.getPath(), {
-                                if (rootAccess) {
-                                    val file = ExtendedFile(dirPath)
-                                    if (file.mkdirs()) Toast.makeText(
-                                        context,
-                                        context.getString(R.string.success),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    else Toast.makeText(
-                                        context,
-                                        context.getString(R.string.failed),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    model.refreshPath()
-                                }
-                            }, {
-                                val file = File(dirPath)
-                                if (file.mkdirs()) Toast.makeText(
-                                    context,
-                                    context.getString(R.string.success),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                else Toast.makeText(
-                                    context,
-                                    context.getString(R.string.failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                model.refreshPath()
-                            }, {}, {}, {
-                                val file = File(dirPath)
-                                if (file.mkdirs()) Toast.makeText(
-                                    context,
-                                    context.getString(R.string.success),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                else Toast.makeText(
-                                    context,
-                                    context.getString(R.string.failed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                model.refreshPath()
-                            })
-                        }
-                        show()
-                    }
-                }
-
-                true
-            }
-            android.R.id.home -> {
-                finish()
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    }.show()
                 true
             }
             else -> {

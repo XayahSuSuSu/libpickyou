@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/menu_def_path"
-        android:icon="@drawable/ic_round_conversion_path"
+        android:icon="@drawable/ic_round_default"
         android:title="@string/def_path"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/menu_create"
-        android:icon="@drawable/ic_round_add"
+        android:id="@+id/menu_confirm"
+        android:icon="@drawable/ic_round_check"
         android:title="@string/create"
         app:showAsAction="ifRoom" />
 </menu>

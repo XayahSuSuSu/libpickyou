@@ -16,7 +16,6 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/top_bar"
                 app:navigationIcon="@drawable/ic_round_arrow_back" />
 
             <HorizontalScrollView
@@ -50,7 +49,6 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -61,18 +59,22 @@
                 android:layout_height="match_parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomAppBar"
+            style="@style/Widget.Material3.BottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:fitsSystemWindows="true"
+            app:hideOnScroll="true" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floating_action_button"
+            android:id="@+id/floatingActionButton_create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="32dp"
-            app:tint="?attr/colorOnPrimarySurface"
-            app:backgroundTint="?attr/colorPrimarySurface"
-            app:srcCompat="@drawable/ic_round_check"/>
+            android:contentDescription="@null"
+            app:layout_anchor="@id/bottomAppBar"
+            app:srcCompat="@drawable/ic_round_add" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
 </layout>
