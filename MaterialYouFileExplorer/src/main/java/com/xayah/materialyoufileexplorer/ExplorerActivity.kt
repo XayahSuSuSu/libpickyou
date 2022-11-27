@@ -325,11 +325,11 @@ class ExplorerActivity : AppCompatActivity() {
                 }
             }
             model.fileList = ((model.folders + model.files) as MutableList<FileInfo>).apply {
-                if (pathStr != "")
+                if (pathStr != "/")
                     add(0, FileInfo("..", true))
             }
             binding.topAppBar.subtitle =
-                "${if (pathStr != "") model.folders.size - 1 else model.folders.size} ${
+                "${if (pathStr != "/") model.folders.size else model.folders.size} ${
                     getString(
                         R.string.folders
                     )

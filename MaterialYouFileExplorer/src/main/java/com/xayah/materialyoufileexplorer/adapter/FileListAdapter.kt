@@ -118,7 +118,9 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
         }
 
         binding.content.setOnLongClickListener {
-            showPopupMenu(it, current)
+            if (current.name != "..") {
+                showPopupMenu(it, current)
+            }
             true
         }
     }
