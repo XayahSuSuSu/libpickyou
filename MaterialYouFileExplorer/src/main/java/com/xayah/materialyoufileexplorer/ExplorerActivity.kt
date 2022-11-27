@@ -494,6 +494,7 @@ class ExplorerActivity : AppCompatActivity() {
         setSupportActionBar(binding.bottomAppBar)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (model.getPath() == "/") finish()
                 PathUtil.onBack(model, this@ExplorerActivity)
             }
         })
