@@ -2,7 +2,7 @@ package com.xayah.materialyoufileexplorer.util
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
-import com.xayah.materialyoufileexplorer.ExplorerActivity
+import com.xayah.materialyoufileexplorer.ExplorerActivity.Companion.rootAccess
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
 
 class PathUtil {
@@ -14,7 +14,7 @@ class PathUtil {
 
         fun onBack(model: ExplorerViewModel, activity: AppCompatActivity) {
             val path = model.getPath()
-            if (!ExplorerActivity.rootAccess && path == STORAGE_EMULATED_0 || path == "") {
+            if (!rootAccess && path == STORAGE_EMULATED_0 || path == "") {
                 activity.finish()
             } else {
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {

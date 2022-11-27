@@ -62,11 +62,10 @@ dependencies {
     implementation 'com.github.DylanCaiCoding:ActivityResultLauncher:1.1.2'
 
     // Libsu
-    def libsuVersion = '4.0.3'
-    // The core module is used by all other components
+    def libsuVersion = '5.0.3'
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
-    // Optional: For com.topjohnwu.superuser.io classes
-    implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
+    implementation "com.github.topjohnwu.libsu:service:${libsuVersion}"
+    implementation "com.github.topjohnwu.libsu:nio:${libsuVersion}"
 
     // Coil
     def coil_version = '1.4.0'

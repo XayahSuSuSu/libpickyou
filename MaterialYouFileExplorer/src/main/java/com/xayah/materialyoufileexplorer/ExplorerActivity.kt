@@ -26,11 +26,15 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.permissionx.guolindev.PermissionX
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
+import com.topjohnwu.superuser.ipc.RootService
+import com.topjohnwu.superuser.nio.ExtendedFile
+import com.topjohnwu.superuser.nio.FileSystemManager
 import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.DialogTextFieldBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
+import com.xayah.materialyoufileexplorer.service.RemoteFileSystemConnection
+import com.xayah.materialyoufileexplorer.service.RemoteFileSystemService
 import com.xayah.materialyoufileexplorer.util.PathUtil
 import com.xayah.materialyoufileexplorer.util.UriUtil
 import java.io.File
@@ -39,7 +43,6 @@ import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.text.Collator
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.io.path.extension
 
 
@@ -49,12 +52,31 @@ class ExplorerActivity : AppCompatActivity() {
     val model: ExplorerViewModel by viewModels()
     lateinit var openDocumentTreeLauncher: ActivityResultLauncher<Uri?>
 
-    init {
-        Shell.enableVerboseLogging = BuildConfig.DEBUG
-        Shell.setDefaultBuilder(
-            Shell.Builder.create().setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
-                .setTimeout(TimeUnit.MILLISECONDS.toSeconds(15 * 1000L))
-        )
+    companion object {
+        init {
+            if (Shell.getCachedShell() == null) {
+                Shell.enableVerboseLogging = BuildConfig.DEBUG
+                Shell.setDefaultBuilder(
+                    Shell.Builder.create()
+                        .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
+                        .setTimeout(10)
+                )
+            }
+        }
+
+        lateinit var fileSystemManager: FileSystemManager
+
+        fun ExtendedFile(path: String): ExtendedFile {
+            return fileSystemManager.getFile(path)
+        }
+
+        val rootAccess by lazy {
+            if (this::fileSystemManager.isInitialized) {
+                ExtendedFile("/dev/console").canRead()
+            } else {
+                false
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +114,7 @@ class ExplorerActivity : AppCompatActivity() {
             model.files.clear()
             PathUtil.handleSpecialPath(pathStr, {
                 if (rootAccess) {
-                    val rootFile = SuFile.open(pathStr)
+                    val rootFile = ExtendedFile(pathStr)
                     if (rootFile.exists()) {
                         try {
                             val list = rootFile.listFiles()!!
@@ -129,7 +151,7 @@ class ExplorerActivity : AppCompatActivity() {
                 }
             }, {
                 if (rootAccess) {
-                    val rootFile = SuFile.open(pathStr)
+                    val rootFile = ExtendedFile(pathStr)
                     if (rootFile.exists()) {
                         try {
                             val list = rootFile.listFiles()!!
@@ -189,7 +211,7 @@ class ExplorerActivity : AppCompatActivity() {
                 }
             }, {
                 if (rootAccess) {
-                    val rootFile = SuFile.open(pathStr)
+                    val rootFile = ExtendedFile(pathStr)
                     if (rootFile.exists()) {
                         try {
                             val list = rootFile.listFiles()!!
@@ -369,6 +391,15 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        val intent = Intent(this, RemoteFileSystemService::class.java)
+        val remoteFileSystemConnection = RemoteFileSystemConnection().apply {
+            setOnServiceConnected {
+                fileSystemManager = it
+            }
+        }
+        RootService.bind(intent, remoteFileSystemConnection)
+
+
         setSupportActionBar(binding.topAppBar)
         openDocumentTreeLauncher = registerForActivityResult(
             ActivityResultContracts.OpenDocumentTree(), this::onOpenDocumentTreeResult
@@ -428,7 +459,7 @@ class ExplorerActivity : AppCompatActivity() {
                                 "${model.getPath()}/${name}"
                             PathUtil.handleSpecialPath(model.getPath(), {
                                 if (rootAccess) {
-                                    val file = SuFile(filePath)
+                                    val file = ExtendedFile(filePath)
                                     if (file.createNewFile()) Toast.makeText(
                                         context,
                                         context.getString(R.string.success),
@@ -475,7 +506,7 @@ class ExplorerActivity : AppCompatActivity() {
                                 "${model.getPath()}/${name}"
                             PathUtil.handleSpecialPath(model.getPath(), {
                                 if (rootAccess) {
-                                    val file = SuFile(dirPath)
+                                    val file = ExtendedFile(dirPath)
                                     if (file.mkdirs()) Toast.makeText(
                                         context,
                                         context.getString(R.string.success),
@@ -529,12 +560,6 @@ class ExplorerActivity : AppCompatActivity() {
             else -> {
                 super.onOptionsItemSelected(item)
             }
-        }
-    }
-
-    companion object {
-        val rootAccess by lazy {
-            SuFile.open("/dev/console").canRead()
         }
     }
 }

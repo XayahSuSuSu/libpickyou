@@ -17,9 +17,8 @@ import coil.clear
 import coil.decode.VideoFrameDecoder
 import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
-import com.xayah.materialyoufileexplorer.ExplorerActivity
+import com.xayah.materialyoufileexplorer.ExplorerActivity.Companion.ExtendedFile
+import com.xayah.materialyoufileexplorer.ExplorerActivity.Companion.rootAccess
 import com.xayah.materialyoufileexplorer.ExplorerViewModel
 import com.xayah.materialyoufileexplorer.R
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
@@ -169,9 +168,9 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                         .setPositiveButton(mContext.getString(R.string.confirm)) { _, _ ->
                             val filePath = "${model.getPath()}/${fileInfo.name}"
                             PathUtil.handleSpecialPath(model.getPath(), {
-                                if (ExplorerActivity.rootAccess) {
-                                    val file = SuFile(filePath)
-                                    file.deleteRecursive()
+                                if (rootAccess) {
+                                    val file = ExtendedFile(filePath)
+                                    file.deleteRecursively()
                                     model.refreshPath()
                                 }
                             }, {
@@ -199,9 +198,9 @@ class FileListAdapter(private val mContext: Context, private val model: Explorer
                             val newFilePath =
                                 "${model.getPath()}/${bindingDialogTextField.textField.text}"
                             PathUtil.handleSpecialPath(model.getPath(), {
-                                if (ExplorerActivity.rootAccess) {
-                                    val file = SuFile(filePath)
-                                    val newFile = SuFile(newFilePath)
+                                if (rootAccess) {
+                                    val file = ExtendedFile(filePath)
+                                    val newFile = ExtendedFile(newFilePath)
                                     file.renameTo(newFile)
                                     model.refreshPath()
                                 }
