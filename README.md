@@ -34,7 +34,7 @@ repositories {
 ```
 2. Implementation
 ```
-implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.2.4'
+implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.3.0'
 ```
 
 ## Usage
@@ -53,6 +53,16 @@ materialYouFileExplorer.toExplorer(context) { path, isFile ->
 #### Custom title
 ```
 materialYouFileExplorer.title = "Custom Title"
+```
+
+#### *Shell Initialization
+If you are using the `com.github.topjohnwu.libsu` dependency in your main project, make sure to add the `FLAG_MOUNT_MASTER` flag when initializing the shell.
+```
+Shell.setDefaultBuilder(
+    Shell.Builder.create()
+        .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
+        .setTimeout(10)
+)
 ```
 
 

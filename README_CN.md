@@ -30,7 +30,7 @@ repositories {
 ```
 2. 引入MaterialYouFileExplorer
 ```
-implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.2.4'
+implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.3.0'
 ```
 
 ## 使用
@@ -49,6 +49,16 @@ materialYouFileExplorer.toExplorer(context) { path, isFile ->
 #### 自定义标题
 ```
 materialYouFileExplorer.title = "Custom Title"
+```
+
+#### *Shell初始化
+如果您在主项目中使用了`com.github.topjohnwu.libsu`依赖，请确保在初始化时添加了`FLAG_MOUNT_MASTER`标志
+```
+Shell.setDefaultBuilder(
+    Shell.Builder.create()
+        .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
+        .setTimeout(10)
+)
 ```
 
 
