@@ -27,15 +27,12 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.permissionx.guolindev.PermissionX
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ipc.RootService
 import com.topjohnwu.superuser.nio.ExtendedFile
-import com.topjohnwu.superuser.nio.FileSystemManager
 import com.xayah.materialyoufileexplorer.adapter.FileListAdapter
 import com.xayah.materialyoufileexplorer.databinding.ActivityExplorerBinding
 import com.xayah.materialyoufileexplorer.databinding.DialogTextFieldBinding
 import com.xayah.materialyoufileexplorer.model.FileInfo
-import com.xayah.materialyoufileexplorer.service.RemoteFileSystemConnection
-import com.xayah.materialyoufileexplorer.service.RemoteFileSystemService
+import com.xayah.materialyoufileexplorer.util.FileSystemManager
 import com.xayah.materialyoufileexplorer.util.PathUtil
 import com.xayah.materialyoufileexplorer.util.UriUtil
 import java.io.File
@@ -69,11 +66,11 @@ class ExplorerActivity : AppCompatActivity() {
         lateinit var fileSystemManager: FileSystemManager
 
         fun ExtendedFile(path: String): ExtendedFile {
-            return fileSystemManager.getFile(path)
+            return fileSystemManager.ExtendedFile(path)
         }
 
         val rootAccess by lazy {
-            if (this::fileSystemManager.isInitialized) {
+            if (fileSystemManager.isInitialized) {
                 ExtendedFile("/dev/console").canRead()
             } else {
                 false
@@ -479,13 +476,7 @@ class ExplorerActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        val intent = Intent(this, RemoteFileSystemService::class.java)
-        val remoteFileSystemConnection = RemoteFileSystemConnection().apply {
-            setOnServiceConnected {
-                fileSystemManager = it
-            }
-        }
-        RootService.bind(intent, remoteFileSystemConnection)
+        fileSystemManager = FileSystemManager(this)
 
         binding.topAppBar.setNavigationOnClickListener {
             finish()
