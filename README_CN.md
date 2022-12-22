@@ -30,7 +30,7 @@ repositories {
 ```
 2. 引入MaterialYouFileExplorer
 ```
-implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.3.0'
+implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.3.1'
 ```
 
 ## 使用
