@@ -34,7 +34,7 @@ repositories {
 ```
 2. Implementation
 ```
-implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.3.1'
+implementation 'com.github.XayahSuSuSu:Android-MaterialYouFileExplorer:1.3.2'
 ```
 
 ## Usage
