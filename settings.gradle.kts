@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "PickYou"
 include(":app")
+include(":libpickyou")
