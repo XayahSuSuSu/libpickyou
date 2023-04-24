@@ -61,4 +61,7 @@ dependencies {
 
     // System UI Controller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
+
+    // Pick you
+    implementation(project(path = ":libpickyou"))
 }
