@@ -1,11 +1,11 @@
-package com.xayah.libpickyou
+package com.xayah.libpickyou.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.xayah.libpickyou.ui.theme.LibPickYouTheme
 
-class LibPickYouActivity : ComponentActivity() {
+internal class LibPickYouActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

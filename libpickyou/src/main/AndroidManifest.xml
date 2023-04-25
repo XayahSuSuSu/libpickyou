@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name=".LibPickYouActivity"
+            android:name=".ui.activity.LibPickYouActivity"
             android:exported="false" />
     </application>
 </manifest>
