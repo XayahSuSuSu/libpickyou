@@ -5,10 +5,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.xayah.libpickyou.ui.tokens.IconButtonTokens
+
+@Composable
+internal fun TextButton(text: String, onClick: () -> Unit) {
+    TextButton(onClick = onClick, content = { Text(text = text) })
+}
 
 @Composable
 internal fun IconButton(icon: ImageVector, onClick: () -> Unit) {

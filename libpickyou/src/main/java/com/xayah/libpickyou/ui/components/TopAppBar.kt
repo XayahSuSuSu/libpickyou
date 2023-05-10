@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
@@ -149,7 +151,8 @@ internal fun PickYouTopAppBar(
     title: String,
     subtitle: String,
     path: List<String>,
-    onPathChanged: (newPath: List<String>) -> Unit
+    onArrowBackPressed: () -> Unit,
+    onPathChanged: (newPath: List<String>) -> Unit,
 ) {
     // Sets the app bar's height offset to collapse the entire bar's height when content is
     // scrolled.
@@ -197,10 +200,13 @@ internal fun PickYouTopAppBar(
                 horizontalArrangement = Arrangement.spacedBy(TopAppBarTokens.Padding),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ArrowBackIconButton {}
+                ArrowBackIconButton(onArrowBackPressed)
                 Column {
                     TopBarTitle(text = title)
-                    TopBarSubTitle(text = subtitle)
+                    TopBarSubTitle(
+                        modifier = Modifier.horizontalScroll(rememberScrollState(0)),
+                        text = subtitle
+                    )
                 }
             }
 

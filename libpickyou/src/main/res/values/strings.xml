@@ -1,0 +1,9 @@
+<resources>
+    <string name="lib_name" translatable="false">PickYou</string>
+    <string name="selected">Selected</string>
+    <string name="none">None</string>
+    <string name="pick">Pick</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="selection_empty">Selection is empty</string>
+</resources>
