@@ -18,6 +18,7 @@ class PickYouLauncher {
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private val mNextLocalRequestCode = AtomicInteger()
     private var type = PickerType.FILE
+    private var limitation = LibPickYouTokens.NoLimitation
 
     private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
         if (result.resultCode == Activity.RESULT_OK) {
@@ -34,9 +35,19 @@ class PickYouLauncher {
         this.type = type
     }
 
+    /**
+     * Set the limitation of PickYou.
+     *
+     * @param number 0: No limitation, others: The number of files/directories user can pick
+     */
+    fun setLimitation(number: Int) {
+        this.limitation = number
+    }
+
     private fun launch(context: Context) {
         val intent = Intent(context, LibPickYouActivity::class.java)
         intent.putExtra(LibPickYouTokens.IntentExtraType, type.type)
+        intent.putExtra(LibPickYouTokens.IntentExtraLimitation, limitation)
         launcher.launch(intent)
     }
 

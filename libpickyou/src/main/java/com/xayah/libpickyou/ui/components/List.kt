@@ -1,5 +1,7 @@
 package com.xayah.libpickyou.ui.components
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,16 +10,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.topjohnwu.superuser.Shell
+import com.xayah.libpickyou.R
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.activity.LibPickYouViewModel
 import com.xayah.libpickyou.ui.activity.PickerType
 import com.xayah.libpickyou.ui.animation.CrossFade
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.DateUtil
 import com.xayah.libpickyou.util.PathUtil
 import com.xayah.libpickyou.util.toPath
@@ -28,6 +34,28 @@ import java.nio.file.Paths
 import java.util.concurrent.CountDownLatch
 
 
+internal fun onCheckBoxClick(
+    viewModel: LibPickYouViewModel,
+    context: Context,
+    name: String,
+    isChecked: MutableState<Boolean>?,
+    checked: Boolean
+) {
+    val limitation = viewModel.getLimitation()
+    if (checked) {
+        if (limitation == LibPickYouTokens.NoLimitation || viewModel.uiState.value.selection.size < limitation) {
+            viewModel.addSelection(name)
+            isChecked?.value = true
+        } else {
+            Toast.makeText(context, "${context.getString(R.string.max_limitation)}: $limitation", Toast.LENGTH_SHORT)
+                .show()
+        }
+    } else {
+        viewModel.removeSelection(name)
+        isChecked?.value = false
+    }
+}
+
 @ExperimentalAnimationApi
 @Composable
 internal fun ContentList(viewModel: LibPickYouViewModel) {
@@ -37,6 +65,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
     val progressLatch = remember { mutableStateOf(CountDownLatch(1)) }
     val contentLatch = remember { mutableStateOf(CountDownLatch(1)) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     LaunchedEffect(state.path) {
         // Loading animation
@@ -92,23 +121,26 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                             }
                         }
                     items(items = state.children.directories, key = { it.name }) {
+                        val isChecked = when (viewModel.uiState.value.type) {
+                            PickerType.DIRECTORY, PickerType.BOTH -> {
+                                remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
+                            }
+
+                            else -> null
+                        }
                         ChildDirListItem(
                             title = it.name,
                             subtitle = DateUtil.timestampToDateString(it.creationTime),
                             link = it.link,
-                            isChecked = when (viewModel.uiState.value.type) {
-                                PickerType.DIRECTORY, PickerType.BOTH -> {
-                                    remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
-                                }
-
-                                else -> null
-                            },
+                            isChecked = isChecked,
                             onCheckBoxClick = { checked ->
-                                if (checked) {
-                                    viewModel.addSelection(it.name)
-                                } else {
-                                    viewModel.removeSelection(it.name)
-                                }
+                                onCheckBoxClick(
+                                    viewModel = viewModel,
+                                    context = context,
+                                    name = it.name,
+                                    isChecked = isChecked,
+                                    checked = checked
+                                )
                             },
                             onItemClick = {
                                 if (it.link.isNullOrEmpty().not())
@@ -119,23 +151,26 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                         )
                     }
                     items(items = state.children.files, key = { it.name }) {
+                        val isChecked = when (viewModel.uiState.value.type) {
+                            PickerType.FILE, PickerType.BOTH -> {
+                                remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
+                            }
+
+                            else -> null
+                        }
                         ChildFileListItem(
                             title = it.name,
                             subtitle = DateUtil.timestampToDateString(it.creationTime),
                             link = it.link,
-                            isChecked = when (viewModel.uiState.value.type) {
-                                PickerType.FILE, PickerType.BOTH -> {
-                                    remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
-                                }
-
-                                else -> null
-                            },
+                            isChecked = isChecked,
                             onCheckBoxClick = { checked ->
-                                if (checked) {
-                                    viewModel.addSelection(it.name)
-                                } else {
-                                    viewModel.removeSelection(it.name)
-                                }
+                                onCheckBoxClick(
+                                    viewModel = viewModel,
+                                    context = context,
+                                    name = it.name,
+                                    isChecked = isChecked,
+                                    checked = checked
+                                )
                             },
                             onItemClick = {}
                         )

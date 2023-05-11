@@ -41,6 +41,12 @@ internal class LibPickYouActivity : ComponentActivity() {
                 PermissionUtil.RequestStoragePermissions()
                 LaunchedEffect(null) {
                     viewModel.setPickerType(PickerType.of(intent.getStringExtra(LibPickYouTokens.IntentExtraType)))
+                    viewModel.setLimitation(
+                        intent.getIntExtra(
+                            LibPickYouTokens.IntentExtraLimitation,
+                            LibPickYouTokens.NoLimitation
+                        )
+                    )
                     viewModel.remoteRootService = RemoteRootService(this@LibPickYouActivity)
                 }
 

@@ -65,8 +65,7 @@ internal fun ChildListItem(
                 Checkbox(
                     checked = isChecked.value,
                     onCheckedChange = {
-                        isChecked.value = isChecked.value.not()
-                        onCheckBoxClick(isChecked.value)
+                        onCheckBoxClick(isChecked.value.not())
                     }
                 )
         }
