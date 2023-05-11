@@ -46,7 +46,7 @@ internal fun PickYouScaffold(
         topBar = {
             PickYouTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = stringResource(R.string.lib_name),
+                title = viewModel.getTitle(),
                 subtitle = "${stringResource(R.string.selected)}: ${
                     if (viewModel.uiState.value.selection.isEmpty())
                         stringResource(R.string.none)

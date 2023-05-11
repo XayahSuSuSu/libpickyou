@@ -19,6 +19,7 @@ class PickYouLauncher {
     private val mNextLocalRequestCode = AtomicInteger()
     private var type = PickerType.FILE
     private var limitation = LibPickYouTokens.NoLimitation
+    private var title = LibPickYouTokens.StringPlaceHolder
 
     private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
         if (result.resultCode == Activity.RESULT_OK) {
@@ -44,10 +45,18 @@ class PickYouLauncher {
         this.limitation = number
     }
 
+    /**
+     * Set the title of PickYou.
+     */
+    fun setTitle(title: String) {
+        this.title = title
+    }
+
     private fun launch(context: Context) {
         val intent = Intent(context, LibPickYouActivity::class.java)
         intent.putExtra(LibPickYouTokens.IntentExtraType, type.type)
         intent.putExtra(LibPickYouTokens.IntentExtraLimitation, limitation)
+        intent.putExtra(LibPickYouTokens.IntentExtraTitle, title)
         launcher.launch(intent)
     }
 

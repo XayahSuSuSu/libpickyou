@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.xayah.libpickyou.R
 import com.xayah.libpickyou.ui.components.ContentList
 import com.xayah.libpickyou.ui.components.PickYouScaffold
 import com.xayah.libpickyou.ui.theme.LibPickYouTheme
@@ -46,6 +47,9 @@ internal class LibPickYouActivity : ComponentActivity() {
                             LibPickYouTokens.IntentExtraLimitation,
                             LibPickYouTokens.NoLimitation
                         )
+                    )
+                    viewModel.setTitle(
+                        intent.getStringExtra(LibPickYouTokens.IntentExtraTitle) ?: getString(R.string.lib_name)
                     )
                     viewModel.remoteRootService = RemoteRootService(this@LibPickYouActivity)
                 }

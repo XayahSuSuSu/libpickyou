@@ -47,6 +47,7 @@ internal class LibPickYouViewModel : ViewModel() {
     val selectedItemsInLine: String
         get() = uiState.value.selection.joinToString(separator = LibPickYouTokens.SelectedItemsInLineSeparator)
     private var limitation: Int = LibPickYouTokens.NoLimitation
+    private var title: String = LibPickYouTokens.StringPlaceHolder
 
     fun setPickerType(type: PickerType) {
         _uiState.value = uiState.value.copy(type = type)
@@ -59,6 +60,15 @@ internal class LibPickYouViewModel : ViewModel() {
     fun setLimitation(number: Int) {
         limitation = number
     }
+
+    fun getTitle(): String {
+        return title
+    }
+
+    fun setTitle(title: String) {
+        this.title = title
+    }
+
 
     fun enter(item: String): Boolean {
         if (item.isEmpty()) return false
