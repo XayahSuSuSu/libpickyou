@@ -3,7 +3,7 @@
 </div>
 
 # PickYou
-[![GitHub release](https://img.shields.io/github/v/release/XayahSuSuSu/Android-MaterialYouFileExplorer?color=orange)](https://github.com/XayahSuSuSu/Android-MaterialYouFileExplorer/releases)  ![minSdk](https://img.shields.io/badge/minSdk-26-green) [![License](https://img.shields.io/github/license/XayahSuSuSu/Android-MaterialYouFileExplorer?color=ff69b4)](./LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/XayahSuSuSu/AndroidModule-PickYou?color=orange)](https://github.com/XayahSuSuSu/AndroidModule-PickYou/releases)  ![minSdk](https://img.shields.io/badge/minSdk-26-green) [![License](https://img.shields.io/github/license/XayahSuSuSu/AndroidModule-PickYou?color=ff69b4)](./LICENSE)
 
 File picker module with the style of Material You.
 
