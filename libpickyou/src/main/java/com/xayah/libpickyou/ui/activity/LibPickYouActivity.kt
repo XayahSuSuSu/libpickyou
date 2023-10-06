@@ -22,6 +22,7 @@ import com.xayah.libpickyou.ui.theme.LibPickYouTheme
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.PermissionUtil
 import com.xayah.libpickyou.util.RemoteRootService
+import com.xayah.libpickyou.util.tryOn
 
 internal class LibPickYouActivity : ComponentActivity() {
     private val viewModel: LibPickYouViewModel by viewModels()
@@ -47,13 +48,15 @@ internal class LibPickYouActivity : ComponentActivity() {
     override fun attachBaseContext(context: Context) {
         val base: Context = if (context is Application) context.baseContext else context
         super.attachBaseContext(base)
-        Shell.setDefaultBuilder(
-            Shell.Builder.create()
-                .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
-                .setInitializers(EnvInitializer::class.java)
-                .setContext(base)
-                .setTimeout(3)
-        )
+        tryOn {
+            Shell.setDefaultBuilder(
+                Shell.Builder.create()
+                    .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
+                    .setInitializers(EnvInitializer::class.java)
+                    .setContext(base)
+                    .setTimeout(3)
+            )
+        }
     }
 
     @ExperimentalPermissionsApi
