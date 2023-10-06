@@ -1,6 +1,8 @@
 package com.xayah.libpickyou.ui.activity
 
 import android.app.Activity
+import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.ui.components.ContentList
 import com.xayah.libpickyou.ui.components.PickYouScaffold
@@ -22,6 +25,36 @@ import com.xayah.libpickyou.util.RemoteRootService
 
 internal class LibPickYouActivity : ComponentActivity() {
     private val viewModel: LibPickYouViewModel by viewModels()
+
+    companion object {
+        class EnvInitializer : Shell.Initializer() {
+            companion object {
+                fun initShell(shell: Shell) {
+                    shell.newJob()
+                        .add("nsenter -t 1 -m su") // Switch to global namespace
+                        .add("set -o pipefail") // Ensure that the exit code of each command is correct.
+                        .exec()
+                }
+            }
+
+            override fun onInit(context: Context, shell: Shell): Boolean {
+                initShell(shell)
+                return true
+            }
+        }
+    }
+
+    override fun attachBaseContext(context: Context) {
+        val base: Context = if (context is Application) context.baseContext else context
+        super.attachBaseContext(base)
+        Shell.setDefaultBuilder(
+            Shell.Builder.create()
+                .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
+                .setInitializers(EnvInitializer::class.java)
+                .setContext(base)
+                .setTimeout(3)
+        )
+    }
 
     @ExperimentalPermissionsApi
     @ExperimentalAnimationApi
