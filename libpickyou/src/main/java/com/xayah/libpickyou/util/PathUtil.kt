@@ -40,8 +40,11 @@ internal class PathUtil {
                         attrs: BasicFileAttributes?
                     ): FileVisitResult {
                         if (file != null && attrs != null) {
-                            val attr = Files.readAttributes(file, BasicFileAttributes::class.java)
-                            val creationTime = attr.creationTime().toMillis()
+                            var creationTime = 0L
+                            tryOn {
+                                val attr = Files.readAttributes(file, BasicFileAttributes::class.java)
+                                creationTime = attr.creationTime().toMillis()
+                            }
                             val fileParcelable = FileParcelable(file.fileName.pathString, creationTime)
                             tryOn {
                                 if (Files.isSymbolicLink(file)) {
@@ -66,11 +69,12 @@ internal class PathUtil {
                             if (dir == path) {
                                 FileVisitResult.CONTINUE
                             } else {
-                                val attr =
-                                    Files.readAttributes(dir, BasicFileAttributes::class.java)
-                                val creationTime = attr.creationTime().toMillis()
-                                val fileParcelable =
-                                    FileParcelable(dir.fileName.pathString, creationTime)
+                                var creationTime = 0L
+                                tryOn {
+                                    val attr = Files.readAttributes(dir, BasicFileAttributes::class.java)
+                                    creationTime = attr.creationTime().toMillis()
+                                }
+                                val fileParcelable = FileParcelable(dir.fileName.pathString, creationTime)
                                 directories.add(fileParcelable)
                                 FileVisitResult.SKIP_SUBTREE
                             }
