@@ -11,6 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,7 +42,8 @@ internal fun onCheckBoxClick(
     isChecked: MutableState<Boolean>?,
     checked: Boolean
 ) {
-    val limitation = viewModel.getLimitation()
+    val uiState by viewModel.uiState
+    val limitation = uiState.limitation
     if (checked) {
         if (limitation == LibPickYouTokens.NoLimitation || viewModel.uiState.value.selection.size < limitation) {
             viewModel.addSelection(name)
@@ -59,7 +61,8 @@ internal fun onCheckBoxClick(
 @ExperimentalAnimationApi
 @Composable
 internal fun ContentList(viewModel: LibPickYouViewModel) {
-    val state = viewModel.uiState.value
+    val uiState by viewModel.uiState
+
     val progressVisible = remember { mutableStateOf(true) }
     val contentVisible = remember { mutableStateOf(false) }
     val progressLatch = remember { mutableStateOf(CountDownLatch(1)) }
@@ -67,7 +70,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    LaunchedEffect(state.path) {
+    LaunchedEffect(uiState.path) {
         // Loading animation
         progressLatch.value = CountDownLatch(1)
         contentLatch.value = CountDownLatch(1)
@@ -81,7 +84,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
 
                 withContext(Dispatchers.Main) {
                     val children: DirChildrenParcelable
-                    val path = Paths.get(state.path.toPath())
+                    val path = Paths.get(uiState.path.toPath())
                     children = if (Shell.getShell().isRoot) {
                         viewModel.remoteRootService.traverse(path)
                     } else {
@@ -114,13 +117,13 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
         CrossFade(targetState = contentVisible, latch = contentLatch) { target ->
             if (target)
                 LazyColumn {
-                    if (viewModel.isAtRoot.not())
+                    if (uiState.isAtRoot.not())
                         item {
                             ChildReturnListItem {
                                 viewModel.exit()
                             }
                         }
-                    items(items = state.children.directories, key = { it.name }) {
+                    items(items = uiState.children.directories, key = { it.name }) {
                         val isChecked = when (viewModel.uiState.value.type) {
                             PickerType.DIRECTORY, PickerType.BOTH -> {
                                 remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
@@ -150,7 +153,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                             }
                         )
                     }
-                    items(items = state.children.files, key = { it.name }) {
+                    items(items = uiState.children.files, key = { it.name }) {
                         val isChecked = when (viewModel.uiState.value.type) {
                             PickerType.FILE, PickerType.BOTH -> {
                                 remember { mutableStateOf(viewModel.isItemSelected(it.name)) }

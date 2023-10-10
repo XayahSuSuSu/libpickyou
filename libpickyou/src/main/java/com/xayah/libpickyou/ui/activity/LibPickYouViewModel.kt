@@ -1,6 +1,7 @@
 package com.xayah.libpickyou.ui.activity
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.topjohnwu.superuser.Shell
@@ -26,47 +27,43 @@ enum class PickerType(val type: String) {
     }
 }
 
-internal data class PickYouState(
+internal data class PickYouUiState(
     val path: List<String> = LibPickYouTokens.DefaultPathList,
     val selection: List<String> = listOf(),
     val children: DirChildrenParcelable = DirChildrenParcelable(),
-    val type: PickerType = PickerType.FILE
-)
+    val type: PickerType = PickerType.FILE,
+
+    val limitation: Int = LibPickYouTokens.NoLimitation,
+    val title: String = LibPickYouTokens.StringPlaceHolder,
+) {
+    val isAtRoot: Boolean
+        get() = path.size == 1
+
+    val pathString: String
+        get() = path.toPath()
+
+    val selectedItems: String
+        get() = selection.joinToString(separator = LibPickYouTokens.SelectedItemsSeparator)
+    val selectedItemsInLine: String
+        get() = selection.joinToString(separator = LibPickYouTokens.SelectedItemsInLineSeparator)
+}
 
 internal class LibPickYouViewModel : ViewModel() {
-    private val _uiState = mutableStateOf(PickYouState())
-    val uiState: State<PickYouState>
+    private val _uiState = mutableStateOf(PickYouUiState())
+    val uiState: State<PickYouUiState>
         get() = _uiState
     lateinit var remoteRootService: RemoteRootService
-    val isAtRoot: Boolean
-        get() = uiState.value.path.size == 1
-    private val pathString: String
-        get() = uiState.value.path.toPath()
-    val selectedItems: String
-        get() = uiState.value.selection.joinToString(separator = LibPickYouTokens.SelectedItemsSeparator)
-    val selectedItemsInLine: String
-        get() = uiState.value.selection.joinToString(separator = LibPickYouTokens.SelectedItemsInLineSeparator)
-    private var limitation: Int = LibPickYouTokens.NoLimitation
-    private var title: String = LibPickYouTokens.StringPlaceHolder
 
     fun setPickerType(type: PickerType) {
         _uiState.value = uiState.value.copy(type = type)
     }
 
-    fun getLimitation(): Int {
-        return limitation
-    }
-
     fun setLimitation(number: Int) {
-        limitation = number
-    }
-
-    fun getTitle(): String {
-        return title
+        _uiState.value = uiState.value.copy(limitation = number)
     }
 
     fun setTitle(title: String) {
-        this.title = title
+        _uiState.value = uiState.value.copy(title = title)
     }
 
 
@@ -80,21 +77,22 @@ internal class LibPickYouViewModel : ViewModel() {
     }
 
     fun exit(): Boolean {
-        if (isAtRoot) return false
-        val state = uiState.value
-        val path = state.path.toMutableList()
+        val uiState by uiState
+        if (uiState.isAtRoot) return false
+        val path = uiState.path.toMutableList()
         path.removeLast()
         onAccessible(path.toPath()) {
-            _uiState.value = state.copy(path = path.toList())
+            _uiState.value = uiState.copy(path = path.toList())
         }
         return true
     }
 
     fun jumpPath(newPath: List<String>): Boolean {
+        val uiState by uiState
+
         if (newPath.isEmpty()) return false
         onAccessible(newPath.toPath()) {
-            val state = uiState.value
-            _uiState.value = state.copy(path = newPath)
+            _uiState.value = uiState.copy(path = newPath)
         }
         return true
     }
@@ -108,10 +106,12 @@ internal class LibPickYouViewModel : ViewModel() {
     }
 
     private fun getPathString(name: String? = null): String {
+        val uiState by uiState
+
         return if (!name.isNullOrEmpty()) {
-            "${pathString}/$name"
+            "${uiState.pathString}/$name"
         } else
-            pathString
+            uiState.pathString
     }
 
     fun isItemSelected(name: String): Boolean {

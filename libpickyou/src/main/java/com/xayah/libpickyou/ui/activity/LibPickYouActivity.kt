@@ -78,15 +78,8 @@ internal class LibPickYouActivity : ComponentActivity() {
                 PermissionUtil.RequestStoragePermissions()
                 LaunchedEffect(null) {
                     viewModel.setPickerType(PickerType.of(intent.getStringExtra(LibPickYouTokens.IntentExtraType)))
-                    viewModel.setLimitation(
-                        intent.getIntExtra(
-                            LibPickYouTokens.IntentExtraLimitation,
-                            LibPickYouTokens.NoLimitation
-                        )
-                    )
-                    viewModel.setTitle(
-                        intent.getStringExtra(LibPickYouTokens.IntentExtraTitle) ?: getString(R.string.lib_name)
-                    )
+                    viewModel.setLimitation(intent.getIntExtra(LibPickYouTokens.IntentExtraLimitation, LibPickYouTokens.NoLimitation))
+                    viewModel.setTitle(intent.getStringExtra(LibPickYouTokens.IntentExtraTitle) ?: getString(R.string.lib_name))
                     viewModel.remoteRootService = RemoteRootService(this@LibPickYouActivity)
                 }
 
@@ -94,16 +87,14 @@ internal class LibPickYouActivity : ComponentActivity() {
                     viewModel = viewModel,
                     onResult = {
                         val intent = Intent()
-                        intent.putStringArrayListExtra(
-                            LibPickYouTokens.IntentExtraPath,
-                            ArrayList(viewModel.uiState.value.selection)
-                        )
+                        intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraPath, ArrayList(viewModel.uiState.value.selection))
                         setResult(Activity.RESULT_OK, intent)
                         finish()
                     },
                     content = {
                         ContentList(viewModel = viewModel)
-                    })
+                    }
+                )
             }
         }
     }

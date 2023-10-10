@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,14 +32,14 @@ internal fun PickYouScaffold(
     onResult: () -> Unit,
     content: @Composable () -> Unit = {}
 ) {
-    val state = viewModel.uiState.value
+    val uiState by viewModel.uiState
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val context = LocalContext.current
     val isDialogOpen = remember { mutableStateOf(false) }
     TextDialog(
         isOpen = isDialogOpen,
         title = stringResource(id = R.string.selected),
-        text = viewModel.selectedItemsInLine,
+        text = uiState.selectedItemsInLine,
         onConfirmClick = onResult
     )
     Scaffold(
@@ -46,14 +47,14 @@ internal fun PickYouScaffold(
         topBar = {
             PickYouTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = viewModel.getTitle(),
+                title = uiState.title,
                 subtitle = "${stringResource(R.string.selected)}: ${
                     if (viewModel.uiState.value.selection.isEmpty())
                         stringResource(R.string.none)
                     else
-                        viewModel.selectedItems
+                        uiState.selectedItems
                 }",
-                path = state.path,
+                path = uiState.path,
                 onArrowBackPressed = onResult,
                 onPathChanged = {
                     viewModel.jumpPath(it)
@@ -64,7 +65,7 @@ internal fun PickYouScaffold(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    if (viewModel.selectedItems.isEmpty())
+                    if (uiState.selectedItems.isEmpty())
                         Toast.makeText(context, context.getString(R.string.selection_empty), Toast.LENGTH_SHORT)
                             .show()
                     else
