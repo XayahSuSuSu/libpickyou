@@ -74,12 +74,15 @@ internal fun PathChipGroup(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     path: List<String>,
-    onPathChanged: (newPath: List<String>) -> Unit
+    pathPrefixHiddenNum: Int,
+    onPathChanged: (newPath: List<String>) -> Unit,
 ) {
     // Ensure the last item is shown once recomposing
     LaunchedEffect(path) {
         lazyListState.animateScrollToItem(path.size - 1)
     }
+
+    if (path.size <= pathPrefixHiddenNum) throw IllegalArgumentException("The path prefix hidden num is greater than total path length.")
 
     LazyRow(modifier = modifier, state = lazyListState) {
         item {
@@ -87,16 +90,18 @@ internal fun PathChipGroup(
         }
 
         items(
-            count = path.size,
+            count = path.size - pathPrefixHiddenNum,
             key = {
                 path.toPath(it)
             }
         ) {
+            val pathIndex = it + pathPrefixHiddenNum
+
             val onPathChipClick = {
-                onPathChanged(path.subPath(it))
+                onPathChanged(path.subPath(pathIndex))
             }
 
-            if (it == 0 && path[it].isEmpty()) {
+            if (it == 0 && path[pathIndex].isEmpty()) {
                 InputChip(
                     selected = false,
                     border = null,
@@ -117,7 +122,7 @@ internal fun PathChipGroup(
                     selected = false,
                     border = null,
                     shape = CircleShape,
-                    label = { Text(path[it]) },
+                    label = { Text(path[pathIndex]) },
                     onClick = onPathChipClick
                 )
             } else {
@@ -125,7 +130,7 @@ internal fun PathChipGroup(
                     selected = false,
                     border = null,
                     shape = CircleShape,
-                    label = { Text(path[it]) },
+                    label = { Text(path[pathIndex]) },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Rounded.KeyboardArrowRight,
@@ -151,6 +156,7 @@ internal fun PickYouTopAppBar(
     title: String,
     subtitle: String,
     path: List<String>,
+    pathPrefixHiddenNum: Int,
     onArrowBackPressed: () -> Unit,
     onPathChanged: (newPath: List<String>) -> Unit,
 ) {
@@ -212,6 +218,7 @@ internal fun PickYouTopAppBar(
 
             PathChipGroup(
                 path = path,
+                pathPrefixHiddenNum = pathPrefixHiddenNum,
                 onPathChanged = onPathChanged
             )
         }

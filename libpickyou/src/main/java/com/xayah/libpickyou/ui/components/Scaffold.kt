@@ -55,6 +55,7 @@ internal fun PickYouScaffold(
                         uiState.selectedItems
                 }",
                 path = uiState.path,
+                pathPrefixHiddenNum = uiState.pathPrefixHiddenNum,
                 onArrowBackPressed = onResult,
                 onPathChanged = {
                     viewModel.jumpPath(it)

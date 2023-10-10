@@ -35,12 +35,19 @@ internal data class PickYouUiState(
 
     val limitation: Int = LibPickYouTokens.NoLimitation,
     val title: String = LibPickYouTokens.StringPlaceHolder,
+    val pathPrefixHiddenNum: Int = LibPickYouTokens.PathPrefixHiddenNum,
 ) {
     val isAtRoot: Boolean
-        get() = path.size == 1
+        get() = path.size == 1 + pathPrefixHiddenNum
 
     val pathString: String
-        get() = path.toPath()
+        get() = run {
+            val newPath = path.toMutableList()
+            repeat(pathPrefixHiddenNum) {
+                newPath.removeFirstOrNull()
+            }
+            newPath.toPath()
+        }
 
     val selectedItems: String
         get() = selection.joinToString(separator = LibPickYouTokens.SelectedItemsSeparator)
@@ -66,13 +73,17 @@ internal class LibPickYouViewModel : ViewModel() {
         _uiState.value = uiState.value.copy(title = title)
     }
 
+    fun setPathPrefixHiddenNum(number: Int) {
+        _uiState.value = uiState.value.copy(pathPrefixHiddenNum = number)
+    }
 
     fun enter(item: String): Boolean {
+        val uiState by uiState
+
         if (item.isEmpty()) return false
-        val state = uiState.value
-        val path = state.path.toMutableList()
+        val path = uiState.path.toMutableList()
         path.add(item)
-        _uiState.value = state.copy(path = path.toList())
+        _uiState.value = uiState.copy(path = path.toList())
         return true
     }
 
@@ -119,21 +130,23 @@ internal class LibPickYouViewModel : ViewModel() {
     }
 
     fun addSelection(name: String): Boolean {
+        val uiState by uiState
+
         if (name.isEmpty() || isItemSelected(name)) return false
-        val state = uiState.value
-        val selection = state.selection.toMutableList()
+        val selection = uiState.selection.toMutableList()
         selection.add(getPathString(name))
-        _uiState.value = state.copy(selection = selection.toList())
+        _uiState.value = uiState.copy(selection = selection.toList())
         return true
     }
 
     fun removeSelection(name: String): Boolean {
-        val index = uiState.value.selection.indexOf(getPathString(name))
+        val uiState by uiState
+
+        val index = uiState.selection.indexOf(getPathString(name))
         if (index == -1) return false
-        val state = uiState.value
-        val selection = state.selection.toMutableList()
+        val selection = uiState.selection.toMutableList()
         selection.removeAt(index)
-        _uiState.value = state.copy(selection = selection.toList())
+        _uiState.value = uiState.copy(selection = selection.toList())
         return true
     }
 

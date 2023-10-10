@@ -32,15 +32,17 @@ import com.xayah.pickyou.ui.theme.PickYouTheme
 class MainActivity : ComponentActivity() {
     private val launcher = PickYouLauncher()
 
-    private fun launch(type: PickerType, number: String, title: String) {
+    private fun launch(type: PickerType, number: String, title: String, pathPrefixHiddenNum: String) {
         val num = number.toIntOrNull()
-        if (num == null) {
+        val hiddenNum = pathPrefixHiddenNum.toIntOrNull()
+        if (num == null || hiddenNum == null) {
             Toast.makeText(this@MainActivity, "Please type number", Toast.LENGTH_SHORT)
                 .show()
         } else {
             launcher.setType(type)
             launcher.setLimitation(num)
             launcher.setTitle(title)
+            launcher.setPathPrefixHiddenNum(hiddenNum)
             launcher.launch(this@MainActivity) { path ->
                 Toast.makeText(this@MainActivity, path.toString(), Toast.LENGTH_SHORT)
                     .show()
@@ -89,20 +91,28 @@ class MainActivity : ComponentActivity() {
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
 
+                        var pathPrefixHiddenNum by remember { mutableStateOf("0") }
+                        OutlinedTextField(
+                            value = pathPrefixHiddenNum,
+                            onValueChange = { pathPrefixHiddenNum = it },
+                            label = { Text("Path prefix hidden num(0: Default)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+
                         Button(
                             onClick = {
-                                launch(PickerType.FILE, number, title)
+                                launch(PickerType.FILE, number, title, pathPrefixHiddenNum)
                             }, content = { Text(text = "Pick file") }
                         )
                         Button(
                             onClick = {
-                                launch(PickerType.DIRECTORY, number, title)
+                                launch(PickerType.DIRECTORY, number, title, pathPrefixHiddenNum)
                             },
                             content = { Text(text = "Pick directory") }
                         )
                         Button(
                             onClick = {
-                                launch(PickerType.BOTH, number, title)
+                                launch(PickerType.BOTH, number, title, pathPrefixHiddenNum)
                             },
                             content = { Text(text = "Pick file or directory") }
                         )

@@ -20,6 +20,7 @@ class PickYouLauncher {
     private var type = PickerType.FILE
     private var limitation = LibPickYouTokens.NoLimitation
     private var title = LibPickYouTokens.StringPlaceHolder
+    private var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
     private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
         if (result.resultCode == Activity.RESULT_OK) {
@@ -52,11 +53,20 @@ class PickYouLauncher {
         this.title = title
     }
 
+    /**
+     * Set prefix path hidden num.
+     * This will hide path prefix on the top of the activity and the return value.
+     */
+    fun setPathPrefixHiddenNum(pathPrefixHiddenNum: Int) {
+        this.pathPrefixHiddenNum = pathPrefixHiddenNum
+    }
+
     private fun launch(context: Context) {
         val intent = Intent(context, LibPickYouActivity::class.java)
         intent.putExtra(LibPickYouTokens.IntentExtraType, type.type)
         intent.putExtra(LibPickYouTokens.IntentExtraLimitation, limitation)
         intent.putExtra(LibPickYouTokens.IntentExtraTitle, title)
+        intent.putExtra(LibPickYouTokens.IntentPathPrefixHiddenNum, pathPrefixHiddenNum)
         launcher.launch(intent)
     }
 
