@@ -17,6 +17,7 @@ internal object LibPickYouTokens {
     const val PathSeparator = "/"
 
     const val IntentExtraPath = "path"
+    const val IntentExtraDefaultPathList = "defaultPathList"
     const val IntentExtraType = "type"
     const val IntentExtraTitle = "title"
     const val IntentExtraLimitation = "limitation"

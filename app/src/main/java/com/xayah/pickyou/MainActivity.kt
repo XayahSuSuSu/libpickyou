@@ -32,13 +32,14 @@ import com.xayah.pickyou.ui.theme.PickYouTheme
 class MainActivity : ComponentActivity() {
     private val launcher = PickYouLauncher()
 
-    private fun launch(type: PickerType, number: String, title: String, pathPrefixHiddenNum: String) {
+    private fun launch(path: String, type: PickerType, number: String, title: String, pathPrefixHiddenNum: String) {
         val num = number.toIntOrNull()
         val hiddenNum = pathPrefixHiddenNum.toIntOrNull()
         if (num == null || hiddenNum == null) {
             Toast.makeText(this@MainActivity, "Please type number", Toast.LENGTH_SHORT)
                 .show()
         } else {
+            launcher.setDefaultPath(path)
             launcher.setType(type)
             launcher.setLimitation(num)
             launcher.setTitle(title)
@@ -82,6 +83,12 @@ class MainActivity : ComponentActivity() {
                             onValueChange = { title = it },
                             label = { Text("Title") }
                         )
+                        var defaultPath by remember { mutableStateOf("/storage/emulated/0") }
+                        OutlinedTextField(
+                            value = defaultPath,
+                            onValueChange = { defaultPath = it },
+                            label = { Text("Default path") },
+                        )
 
                         var number by remember { mutableStateOf("0") }
                         OutlinedTextField(
@@ -101,18 +108,18 @@ class MainActivity : ComponentActivity() {
 
                         Button(
                             onClick = {
-                                launch(PickerType.FILE, number, title, pathPrefixHiddenNum)
+                                launch(defaultPath, PickerType.FILE, number, title, pathPrefixHiddenNum)
                             }, content = { Text(text = "Pick file") }
                         )
                         Button(
                             onClick = {
-                                launch(PickerType.DIRECTORY, number, title, pathPrefixHiddenNum)
+                                launch(defaultPath, PickerType.DIRECTORY, number, title, pathPrefixHiddenNum)
                             },
                             content = { Text(text = "Pick directory") }
                         )
                         Button(
                             onClick = {
-                                launch(PickerType.BOTH, number, title, pathPrefixHiddenNum)
+                                launch(defaultPath, PickerType.BOTH, number, title, pathPrefixHiddenNum)
                             },
                             content = { Text(text = "Pick file or directory") }
                         )

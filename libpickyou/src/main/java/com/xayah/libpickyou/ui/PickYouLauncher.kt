@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class PickYouLauncher {
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private val mNextLocalRequestCode = AtomicInteger()
+    private var defaultPathList = LibPickYouTokens.DefaultPathList
     private var type = PickerType.FILE
     private var limitation = LibPickYouTokens.NoLimitation
     private var title = LibPickYouTokens.StringPlaceHolder
@@ -26,6 +27,13 @@ class PickYouLauncher {
         if (result.resultCode == Activity.RESULT_OK) {
             onResult(result.data?.getStringArrayListExtra(LibPickYouTokens.IntentExtraPath)?.toList() ?: listOf())
         }
+    }
+
+    /**
+     * Set the default path
+     */
+    fun setDefaultPath(path: String) {
+        this.defaultPathList = path.split(LibPickYouTokens.PathSeparator)
     }
 
     /**
@@ -67,6 +75,7 @@ class PickYouLauncher {
         intent.putExtra(LibPickYouTokens.IntentExtraLimitation, limitation)
         intent.putExtra(LibPickYouTokens.IntentExtraTitle, title)
         intent.putExtra(LibPickYouTokens.IntentPathPrefixHiddenNum, pathPrefixHiddenNum)
+        intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraDefaultPathList, ArrayList(defaultPathList))
         launcher.launch(intent)
     }
 

@@ -61,6 +61,10 @@ internal class LibPickYouViewModel : ViewModel() {
         get() = _uiState
     lateinit var remoteRootService: RemoteRootService
 
+    fun setDefaultPathList(path: List<String>) {
+        _uiState.value = uiState.value.copy(path = path)
+    }
+
     fun setPickerType(type: PickerType) {
         _uiState.value = uiState.value.copy(type = type)
     }

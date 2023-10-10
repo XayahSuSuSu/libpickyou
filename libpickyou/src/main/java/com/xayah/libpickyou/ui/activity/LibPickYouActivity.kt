@@ -81,6 +81,7 @@ internal class LibPickYouActivity : ComponentActivity() {
                     viewModel.setLimitation(intent.getIntExtra(LibPickYouTokens.IntentExtraLimitation, LibPickYouTokens.NoLimitation))
                     viewModel.setTitle(intent.getStringExtra(LibPickYouTokens.IntentExtraTitle) ?: getString(R.string.lib_name))
                     viewModel.setPathPrefixHiddenNum(intent.getIntExtra(LibPickYouTokens.IntentPathPrefixHiddenNum, LibPickYouTokens.PathPrefixHiddenNum))
+                    viewModel.setDefaultPathList(intent.getStringArrayListExtra(LibPickYouTokens.IntentExtraDefaultPathList)?.toList() ?: LibPickYouTokens.DefaultPathList)
                     viewModel.remoteRootService = RemoteRootService(this@LibPickYouActivity)
                 }
 
