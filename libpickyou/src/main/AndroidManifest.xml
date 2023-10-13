@@ -8,7 +8,9 @@
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
-    <application android:requestLegacyExternalStorage="true">
+    <application
+        android:requestLegacyExternalStorage="true"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".ui.activity.LibPickYouActivity"
             android:exported="false" />

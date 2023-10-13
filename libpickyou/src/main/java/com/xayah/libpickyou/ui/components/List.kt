@@ -2,6 +2,7 @@ package com.xayah.libpickyou.ui.components
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,6 +64,10 @@ internal fun onCheckBoxClick(
 internal fun ContentList(viewModel: LibPickYouViewModel) {
     val uiState by viewModel.uiState
 
+    BackHandler(uiState.canUp) {
+        viewModel.exit()
+    }
+
     val progressVisible = remember { mutableStateOf(true) }
     val contentVisible = remember { mutableStateOf(false) }
     val progressLatch = remember { mutableStateOf(CountDownLatch(1)) }
@@ -117,7 +122,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
         CrossFade(targetState = contentVisible, latch = contentLatch) { target ->
             if (target)
                 LazyColumn {
-                    if (uiState.isAtRoot.not())
+                    if (uiState.canUp)
                         item {
                             ChildReturnListItem {
                                 viewModel.exit()
