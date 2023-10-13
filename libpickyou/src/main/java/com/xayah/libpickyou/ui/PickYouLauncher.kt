@@ -82,28 +82,26 @@ class PickYouLauncher {
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
-    fun launch(componentActivity: ComponentActivity, onResult: (path: List<String>) -> Unit) {
+    fun launch(context: Context, onResult: (path: List<String>) -> Unit) {
         launcher =
-            componentActivity.registerForActivityResultCompat(
+            context.registerForActivityResultCompat(
                 mNextLocalRequestCode,
                 ActivityResultContracts.StartActivityForResult()
             ) { result: ActivityResult ->
                 onResult(result, onResult)
             }
-        launch(componentActivity)
+        launch(context)
     }
 
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
-    fun launch(fragment: Fragment, onResult: (path: List<String>) -> Unit) {
-        launcher =
-            fragment.registerForActivityResultCompat(
-                mNextLocalRequestCode,
-                ActivityResultContracts.StartActivityForResult()
-            ) { result: ActivityResult ->
-                onResult(result, onResult)
-            }
-        launch(fragment.requireContext())
-    }
+    fun launch(componentActivity: ComponentActivity, onResult: (path: List<String>) -> Unit) =
+        launch(context = componentActivity, onResult)
+
+    /**
+     * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
+     */
+    fun launch(fragment: Fragment, onResult: (path: List<String>) -> Unit) =
+        launch(fragment.requireContext(), onResult)
 }
