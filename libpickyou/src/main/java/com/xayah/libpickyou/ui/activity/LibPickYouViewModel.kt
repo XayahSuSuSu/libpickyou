@@ -37,8 +37,8 @@ internal data class PickYouUiState(
     val title: String = LibPickYouTokens.StringPlaceHolder,
     val pathPrefixHiddenNum: Int = LibPickYouTokens.PathPrefixHiddenNum,
 ) {
-    val isAtRoot: Boolean
-        get() = path.size == 1 + pathPrefixHiddenNum
+    val canUp: Boolean
+        get() = isAccessible(path.toMutableList().apply { removeLast() })
 
     val pathString: String
         get() = run {
@@ -93,10 +93,10 @@ internal class LibPickYouViewModel : ViewModel() {
 
     fun exit(): Boolean {
         val uiState by uiState
-        if (uiState.isAtRoot) return false
+        if (!uiState.canUp) return false
         val path = uiState.path.toMutableList()
         path.removeLast()
-        onAccessible(path.toPath()) {
+        onAccessible(path) {
             _uiState.value = uiState.copy(path = path.toList())
         }
         return true
@@ -106,7 +106,7 @@ internal class LibPickYouViewModel : ViewModel() {
         val uiState by uiState
 
         if (newPath.isEmpty()) return false
-        onAccessible(newPath.toPath()) {
+        onAccessible(newPath) {
             _uiState.value = uiState.copy(path = newPath)
         }
         return true
@@ -154,12 +154,15 @@ internal class LibPickYouViewModel : ViewModel() {
         return true
     }
 
-    private fun onAccessible(path: String, block: () -> Unit) {
-        val defaultPath = LibPickYouTokens.DefaultPathList.toPath()
-        if (path.contains(defaultPath).not()) {
-            if (Shell.getShell().isRoot) block()
-        } else {
-            block()
-        }
+    private fun onAccessible(path: List<String>, block: () -> Unit) {
+        if (isAccessible(path)) block()
     }
+}
+
+private fun isAccessible(path: List<String>): Boolean {
+    if (path.isEmpty()) return false
+    val defaultPath = LibPickYouTokens.DefaultPathList.toPath()
+    if (defaultPath in path.toPath()) return true
+    if (Shell.getShell().isRoot) return true
+    return false
 }
