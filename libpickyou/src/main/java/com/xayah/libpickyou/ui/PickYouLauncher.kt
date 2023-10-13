@@ -12,7 +12,11 @@ import com.xayah.libpickyou.ui.activity.LibPickYouActivity
 import com.xayah.libpickyou.ui.activity.PickerType
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.registerForActivityResultCompat
+import kotlinx.coroutines.CancellationException
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class PickYouLauncher {
     private lateinit var launcher: ActivityResultLauncher<Intent>
@@ -82,28 +86,48 @@ class PickYouLauncher {
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
-    fun launch(componentActivity: ComponentActivity, onResult: (path: List<String>) -> Unit) {
+    fun launch(context: Context, onResult: (path: List<String>) -> Unit) {
         launcher =
-            componentActivity.registerForActivityResultCompat(
+            context.registerForActivityResultCompat(
                 mNextLocalRequestCode,
                 ActivityResultContracts.StartActivityForResult()
             ) { result: ActivityResult ->
                 onResult(result, onResult)
             }
-        launch(componentActivity)
+        launch(context)
     }
 
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
-    fun launch(fragment: Fragment, onResult: (path: List<String>) -> Unit) {
+    fun launch(componentActivity: ComponentActivity, onResult: (path: List<String>) -> Unit) =
+        launch(context = componentActivity, onResult)
+
+    /**
+     * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
+     */
+    fun launch(fragment: Fragment, onResult: (path: List<String>) -> Unit) =
+        launch(fragment.requireContext(), onResult)
+
+    suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
+        // There is no cancellation support since we cannot cancel a launched Intent
         launcher =
-            fragment.registerForActivityResultCompat(
+            context.registerForActivityResultCompat(
                 mNextLocalRequestCode,
                 ActivityResultContracts.StartActivityForResult()
             ) { result: ActivityResult ->
-                onResult(result, onResult)
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val r = result.data?.getStringArrayListExtra(LibPickYouTokens.IntentExtraPath)
+                        ?.toList()?.takeIf { it.isNotEmpty() }
+                    if (r != null) {
+                        cont.resume(r)
+                    } else {
+                        cont.resumeWithException(CancellationException("FilePicker launcher returned empty list!"))
+                    }
+                } else if (result.resultCode == Activity.RESULT_CANCELED) {
+                    cont.resumeWithException(CancellationException("FilePicker launcher cancelled!"))
+                }
             }
-        launch(fragment.requireContext())
+        launch(context)
     }
 }

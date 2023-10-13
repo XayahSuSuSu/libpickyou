@@ -15,10 +15,13 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.xayah.libpickyou.ui.PickYouLauncher
 import com.xayah.libpickyou.ui.activity.PickerType
 import com.xayah.pickyou.ui.theme.PickYouTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val launcher = PickYouLauncher()
@@ -51,22 +55,45 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private suspend fun SnackbarHostState.launch(path: String, type: PickerType, number: String, title: String, pathPrefixHiddenNum: String) {
+        val num = number.toIntOrNull()
+        val hiddenNum = pathPrefixHiddenNum.toIntOrNull()
+        if (num == null || hiddenNum == null) {
+            showSnackbar("Please type number")
+        } else {
+            launcher.setDefaultPath(path)
+            launcher.setType(type)
+            launcher.setLimitation(num)
+            launcher.setTitle(title)
+            launcher.setPathPrefixHiddenNum(hiddenNum)
+            val path = launcher.awaitPickerOnce(this@MainActivity)
+            showSnackbar(path.toString())
+        }
+    }
+
     @ExperimentalMaterial3Api
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PickYouTheme {
-                Scaffold(topBar = {
-                    CenterAlignedTopAppBar(
-                        title = {
-                            Text(
-                                "PickYou sample",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    )
-                }) { innerPadding ->
+                val snackbarHostState = remember { SnackbarHostState() }
+                val coroutineScope = rememberCoroutineScope()
+                Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                Text(
+                                    "PickYou sample",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        )
+                    },
+                    snackbarHost = {
+                        SnackbarHost(snackbarHostState)
+                    },
+                ) { innerPadding ->
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -122,6 +149,17 @@ class MainActivity : ComponentActivity() {
                                 launch(defaultPath, PickerType.BOTH, number, title, pathPrefixHiddenNum)
                             },
                             content = { Text(text = "Pick file or directory") }
+                        )
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    runCatching {
+                                        snackbarHostState.launch(defaultPath, PickerType.BOTH, number, title, pathPrefixHiddenNum)
+                                    }.onFailure {
+                                        snackbarHostState.showSnackbar(it.message.orEmpty())
+                                    }
+                                }
+                            }, content = { Text(text = "Pick file suspendly") }
                         )
 
                         Spacer(
