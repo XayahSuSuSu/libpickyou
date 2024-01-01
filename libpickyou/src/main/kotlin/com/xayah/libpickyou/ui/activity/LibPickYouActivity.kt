@@ -9,19 +9,31 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.ui.components.ContentList
 import com.xayah.libpickyou.ui.components.PickYouScaffold
+import com.xayah.libpickyou.ui.components.SelectionScaffold
 import com.xayah.libpickyou.ui.theme.LibPickYouTheme
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.PermissionUtil
 import com.xayah.libpickyou.util.RemoteRootService
 import com.xayah.libpickyou.util.tryOn
+
+sealed class PickYouRoutes(val route: String) {
+    object PickYou : PickYouRoutes(route = "pickyou")
+    object Selection : PickYouRoutes(route = "selection")
+}
+
 
 internal class LibPickYouActivity : ComponentActivity() {
     private val viewModel: LibPickYouViewModel by viewModels()
@@ -74,22 +86,45 @@ internal class LibPickYouActivity : ComponentActivity() {
                     viewModel.setLimitation(intent.getIntExtra(LibPickYouTokens.IntentExtraLimitation, LibPickYouTokens.NoLimitation))
                     viewModel.setTitle(intent.getStringExtra(LibPickYouTokens.IntentExtraTitle) ?: getString(R.string.lib_name))
                     viewModel.setPathPrefixHiddenNum(intent.getIntExtra(LibPickYouTokens.IntentPathPrefixHiddenNum, LibPickYouTokens.PathPrefixHiddenNum))
-                    viewModel.setDefaultPathList(intent.getStringArrayListExtra(LibPickYouTokens.IntentExtraDefaultPathList)?.toList() ?: LibPickYouTokens.DefaultPathList)
+                    viewModel.setDefaultPathList(
+                        intent.getStringArrayListExtra(LibPickYouTokens.IntentExtraDefaultPathList)?.toList() ?: LibPickYouTokens.DefaultPathList
+                    )
                     viewModel.remoteRootService = RemoteRootService(this@LibPickYouActivity)
                 }
 
-                PickYouScaffold(
-                    viewModel = viewModel,
-                    onResult = {
-                        val intent = Intent()
-                        intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraPath, ArrayList(viewModel.uiState.value.selection))
-                        setResult(Activity.RESULT_OK, intent)
-                        finish()
-                    },
-                    content = {
-                        ContentList(viewModel = viewModel)
+                val navController = rememberNavController()
+                val onResult = {
+                    val intent = Intent()
+                    intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraPath, ArrayList(viewModel.uiState.value.selection))
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+                NavHost(
+                    navController = navController,
+                    startDestination = PickYouRoutes.PickYou.route,
+                    enterTransition = { fadeIn() },
+                    popEnterTransition = { fadeIn() },
+                    exitTransition = { fadeOut() },
+                    popExitTransition = { fadeOut() },
+                ) {
+                    composable(PickYouRoutes.PickYou.route) {
+                        PickYouScaffold(
+                            navController = navController,
+                            viewModel = viewModel,
+                            onResult = onResult,
+                            content = {
+                                ContentList(viewModel = viewModel)
+                            }
+                        )
                     }
-                )
+                    composable(PickYouRoutes.Selection.route) {
+                        SelectionScaffold(
+                            viewModel.uiState.value.selection,
+                            onBack = { navController.popBackStack() },
+                            onConfirm = onResult
+                        )
+                    }
+                }
             }
         }
     }

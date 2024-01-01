@@ -44,8 +44,9 @@ internal fun BodyMediumText(text: String) {
 }
 
 @Composable
-internal fun LabelSmallText(text: String) {
+internal fun LabelSmallText(modifier: Modifier = Modifier, text: String) {
     Text(
+        modifier = modifier,
         text = text,
         style = MaterialTheme.typography.labelSmall
     )

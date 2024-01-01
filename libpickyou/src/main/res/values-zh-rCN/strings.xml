@@ -6,4 +6,5 @@
     <string name="cancel">取消</string>
     <string name="selection_empty">选择为空</string>
     <string name="max_limitation">最大限制</string>
+    <string name="confirm_your_selections">确认你的选择</string>
 </resources>

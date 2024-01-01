@@ -7,4 +7,5 @@
     <string name="cancel">Cancel</string>
     <string name="selection_empty">Selection is empty</string>
     <string name="max_limitation">Max limitation</string>
+    <string name="confirm_your_selections">Confirm your selections</string>
 </resources>
