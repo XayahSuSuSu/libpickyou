@@ -60,6 +60,9 @@ dependencies {
     // libsu
     implementation(libs.libsu.core)
     implementation(libs.libsu.service)
+
+    // Compose Navigation
+    implementation(libs.androidx.navigation.compose)
 }
 
 afterEvaluate {
