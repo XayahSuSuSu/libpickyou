@@ -9,13 +9,13 @@ compose-compiler = "1.4.3"
 
 # libraries
 accompanist = "0.30.1"
-activity-compose = "1.7.2"
+activity-compose = "1.8.2"
 appcompat = "1.6.1"
-compose-bom = "2023.09.02"
+compose-bom = "2023.10.01"
 core-ktx = "1.12.0"
 lifecycle-runtime-ktx = "2.6.2"
 lifecycle-viewmodel-compose = "2.6.2"
-libsu = "5.2.1"
+libsu = "5.2.2"
 
 # plugins
 android-gradle-plugin = "8.1.2"
