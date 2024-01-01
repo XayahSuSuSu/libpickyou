@@ -3,7 +3,7 @@ package com.xayah.libpickyou.parcelables
 import android.os.Parcel
 import android.os.Parcelable
 
-internal class FileParcelable() : Parcelable {
+class FileParcelable() : Parcelable {
     var name: String = ""
     var creationTime: Long = 0
     var link: String? = null

@@ -8,11 +8,13 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.activity.LibPickYouActivity
 import com.xayah.libpickyou.ui.activity.PickerType
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.registerForActivityResultCompat
 import kotlinx.coroutines.CancellationException
+import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -26,6 +28,11 @@ class PickYouLauncher {
     private var limitation = LibPickYouTokens.NoLimitation
     private var title = LibPickYouTokens.StringPlaceHolder
     private var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
+    private var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+
+    companion object {
+        var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+    }
 
     private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
         if (result.resultCode == Activity.RESULT_OK) {
@@ -73,6 +80,13 @@ class PickYouLauncher {
         this.pathPrefixHiddenNum = pathPrefixHiddenNum
     }
 
+    /**
+     * Set the backend of traverse.
+     */
+    fun setTraverseBackend(backend: (path: Path) -> DirChildrenParcelable) {
+        this.traverseBackend = backend
+    }
+
     private fun launch(context: Context) {
         val intent = Intent(context, LibPickYouActivity::class.java)
         intent.putExtra(LibPickYouTokens.IntentExtraType, type.type)
@@ -80,6 +94,7 @@ class PickYouLauncher {
         intent.putExtra(LibPickYouTokens.IntentExtraTitle, title)
         intent.putExtra(LibPickYouTokens.IntentPathPrefixHiddenNum, pathPrefixHiddenNum)
         intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraDefaultPathList, ArrayList(defaultPathList))
+        PickYouLauncher.traverseBackend = this.traverseBackend
         launcher.launch(intent)
     }
 

@@ -3,7 +3,7 @@ package com.xayah.libpickyou.parcelables
 import android.os.Parcel
 import android.os.Parcelable
 
-internal class DirChildrenParcelable() : Parcelable {
+class DirChildrenParcelable() : Parcelable {
     var files: List<FileParcelable> = listOf()
     var directories: List<FileParcelable> = listOf()
 

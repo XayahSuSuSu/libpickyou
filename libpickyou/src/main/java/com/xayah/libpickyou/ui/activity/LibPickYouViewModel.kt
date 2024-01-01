@@ -163,6 +163,5 @@ private fun isAccessible(path: List<String>): Boolean {
     if (path.isEmpty()) return false
     val defaultPath = LibPickYouTokens.DefaultPathList.toPath()
     if (defaultPath in path.toPath()) return true
-    if (Shell.getShell().isRoot) return true
-    return false
+    return Shell.getShell().isRoot
 }

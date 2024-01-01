@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
+import com.xayah.libpickyou.ui.PickYouLauncher
 import com.xayah.libpickyou.ui.activity.LibPickYouViewModel
 import com.xayah.libpickyou.ui.activity.PickerType
 import com.xayah.libpickyou.ui.animation.CrossFade
@@ -90,7 +91,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                 withContext(Dispatchers.Main) {
                     val children: DirChildrenParcelable
                     val path = Paths.get(uiState.path.toPath())
-                    children = if (Shell.getShell().isRoot) {
+                    children = PickYouLauncher.traverseBackend?.invoke(path) ?: if (Shell.getShell().isRoot) {
                         viewModel.remoteRootService.traverse(path)
                     } else {
                         PathUtil.traverse(path)
