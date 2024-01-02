@@ -3,9 +3,9 @@
 </div>
 
 # PickYou
-[![GitHub release](https://img.shields.io/github/v/tag/XayahSuSuSu/AndroidModule-PickYou?color=orange)](https://github.com/XayahSuSuSu/AndroidModule-PickYou/tags)  ![minSdk](https://img.shields.io/badge/minSdk-26-green) [![License](https://img.shields.io/github/license/XayahSuSuSu/AndroidModule-PickYou?color=ff69b4)](./LICENSE)
+[![JitPack](https://jitpack.io/v/xayahsususu/libpickyou.svg)](https://jitpack.io/#xayahsususu/libpickyou)  ![minSdk](https://img.shields.io/badge/minSdk-26-green) [![License](https://img.shields.io/github/license/XayahSuSuSu/AndroidModule-PickYou?color=ff69b4)](./LICENSE)
 
-File picker module with the style of Material You.
+Android file picker module with the style of Material You.
 
 Use this module to pick files/directories easily.
 
@@ -14,6 +14,7 @@ Use this module to pick files/directories easily.
 - Easy to import and use.
 - Highly customizable.
 - Support for single/multiple selection.
+- Monet enabled.
 
 ## Screenshots
 <div align="center">
@@ -40,19 +41,19 @@ repositories {
 2. Implementation
 * **Groovy**
 ```
-implementation 'com.github.XayahSuSuSu:AndroidModule-PickYou:$PickYouVersion'
+implementation 'com.github.xayahsususu:libpickyou:$PickYouVersion'
 ```
 
 * **Kotlin**
 ```
-implementation("com.github.XayahSuSuSu:AndroidModule-PickYou:$PickYouVersion")
+implementation("com.github.xayahsususu:libpickyou:$PickYouVersion")
 ```
 
 ## Usage
 1. Launch anywhere
 ```
 val launcher = PickYouLauncher()
-launcher.launch(this) { path ->
+launcher.launch(context) { path ->
     // Code here.
 }
 ```
