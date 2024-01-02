@@ -17,6 +17,7 @@ import com.xayah.libpickyou.util.registerForActivityResultCompat
 import kotlinx.coroutines.CancellationException
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -47,18 +48,17 @@ class PickYouLauncher {
             }
         }
 
-        fun launch(context: Context, onPathResult: (path: List<String>) -> Unit) {
+        private fun getLauncher(context: Context, requestCode: AtomicInteger, onPathResult: (path: List<String>) -> Unit): ActivityResultLauncher<Intent> =
             context.registerForActivityResultCompat(
-                AtomicInteger(),
+                requestCode,
                 ActivityResultContracts.StartActivityForResult()
-            ) { result: ActivityResult -> onResult(result, onPathResult) }.apply {
-                launch(Intent(context, LibPickYouActivity::class.java))
+            ) { result: ActivityResult ->
+                onResult(result, onPathResult)
             }
-        }
 
-        suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
+        private fun getLauncher(context: Context, requestCode: AtomicInteger, cont: Continuation<List<String>>): ActivityResultLauncher<Intent> =
             context.registerForActivityResultCompat(
-                AtomicInteger(),
+                requestCode,
                 ActivityResultContracts.StartActivityForResult()
             ) { result: ActivityResult ->
                 if (result.resultCode == Activity.RESULT_OK) {
@@ -72,7 +72,16 @@ class PickYouLauncher {
                 } else if (result.resultCode == Activity.RESULT_CANCELED) {
                     cont.resumeWithException(CancellationException("Launcher got cancelled."))
                 }
-            }.apply {
+            }
+
+        fun launch(context: Context, onPathResult: (path: List<String>) -> Unit) {
+            getLauncher(context, AtomicInteger(), onPathResult).apply {
+                launch(Intent(context, LibPickYouActivity::class.java))
+            }
+        }
+
+        suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
+            getLauncher(context, AtomicInteger(), cont).apply {
                 launch(Intent(context, LibPickYouActivity::class.java))
             }
         }
@@ -133,13 +142,7 @@ class PickYouLauncher {
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
     fun launch(context: Context, onResult: (path: List<String>) -> Unit) {
-        mLauncher =
-            context.registerForActivityResultCompat(
-                mNextLocalRequestCode,
-                ActivityResultContracts.StartActivityForResult()
-            ) { result: ActivityResult ->
-                onResult(result, onResult)
-            }
+        mLauncher = getLauncher(context, mNextLocalRequestCode, onResult)
         launch(context)
     }
 
@@ -155,23 +158,7 @@ class PickYouLauncher {
 
     suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
         // There is no cancellation support since we cannot cancel a launched Intent
-        mLauncher =
-            context.registerForActivityResultCompat(
-                mNextLocalRequestCode,
-                ActivityResultContracts.StartActivityForResult()
-            ) { result: ActivityResult ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val r = result.data?.getStringArrayListExtra(LibPickYouTokens.IntentExtraPath)
-                        ?.toList()?.takeIf { it.isNotEmpty() }
-                    if (r != null) {
-                        cont.resume(r)
-                    } else {
-                        cont.resumeWithException(CancellationException("Launcher returned empty list."))
-                    }
-                } else if (result.resultCode == Activity.RESULT_CANCELED) {
-                    cont.resumeWithException(CancellationException("Launcher got cancelled."))
-                }
-            }
+        mLauncher = getLauncher(context, mNextLocalRequestCode, cont)
         launch(context)
     }
 }
