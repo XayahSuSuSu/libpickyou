@@ -33,18 +33,27 @@ class PickYouLauncher {
     private var mPathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
     companion object {
-        internal var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
-        internal var permissionType: PermissionType = PermissionType.NORMAL
-        internal var defaultPathList = LibPickYouTokens.DefaultPathList
-        internal var pickerType = PickerType.FILE
-        internal var limitation = LibPickYouTokens.NoLimitation
-        internal var title = LibPickYouTokens.StringPlaceHolder
-        internal var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
-    }
+        var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        var permissionType: PermissionType = PermissionType.NORMAL
+        var defaultPathList = LibPickYouTokens.DefaultPathList
+        var pickerType = PickerType.FILE
+        var limitation = LibPickYouTokens.NoLimitation
+        var title = LibPickYouTokens.StringPlaceHolder
+        var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
-    private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
-        if (result.resultCode == Activity.RESULT_OK) {
-            onResult(result.data?.getStringArrayListExtra(LibPickYouTokens.IntentExtraPath)?.toList() ?: listOf())
+        private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
+            if (result.resultCode == Activity.RESULT_OK) {
+                onResult(result.data?.getStringArrayListExtra(LibPickYouTokens.IntentExtraPath)?.toList() ?: listOf())
+            }
+        }
+
+        fun launch(context: Context, onPathResult: (path: List<String>) -> Unit) {
+            context.registerForActivityResultCompat(
+                AtomicInteger(),
+                ActivityResultContracts.StartActivityForResult()
+            ) { result: ActivityResult -> onResult(result, onPathResult) }.apply {
+                launch(Intent(context, LibPickYouActivity::class.java))
+            }
         }
     }
 
