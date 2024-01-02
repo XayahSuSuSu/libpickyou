@@ -136,10 +136,10 @@ class PickYouLauncher {
                     if (r != null) {
                         cont.resume(r)
                     } else {
-                        cont.resumeWithException(CancellationException("FilePicker launcher returned empty list!"))
+                        cont.resumeWithException(CancellationException("Launcher returned empty list."))
                     }
                 } else if (result.resultCode == Activity.RESULT_CANCELED) {
-                    cont.resumeWithException(CancellationException("FilePicker launcher cancelled!"))
+                    cont.resumeWithException(CancellationException("Launcher got cancelled."))
                 }
             }
         launch(context)
