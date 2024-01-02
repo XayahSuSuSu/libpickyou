@@ -10,16 +10,16 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * it's just something like a global slot scope for easier usage.
  */
 @Composable
-fun rememberSlotScope(): SlotScope {
+internal fun rememberSlotScope(): SlotScope {
     val dialogState = rememberDialogState()
     return remember { SlotScope(dialogSlot = dialogState) }
 }
 
-data class SlotScope(
+internal data class SlotScope(
     val dialogSlot: DialogState,
 )
 
 /**
  * Provide this [androidx.compose.runtime.CompositionLocal] at top-level composable for passing [SlotScope] down through the Composition implicitly.
  */
-val LocalSlotScope: ProvidableCompositionLocal<SlotScope?> = staticCompositionLocalOf { null }
+internal val LocalSlotScope: ProvidableCompositionLocal<SlotScope?> = staticCompositionLocalOf { null }

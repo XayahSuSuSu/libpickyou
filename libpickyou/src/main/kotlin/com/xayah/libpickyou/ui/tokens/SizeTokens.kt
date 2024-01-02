@@ -2,7 +2,7 @@ package com.xayah.libpickyou.ui.tokens
 
 import androidx.compose.ui.unit.dp
 
-object SizeTokens {
+internal object SizeTokens {
     val Level0 = 0.dp
     val Level1 = 8.dp
     val Level2 = 12.dp

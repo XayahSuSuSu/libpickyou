@@ -39,7 +39,6 @@ import kotlinx.coroutines.withContext
 import java.nio.file.Paths
 import java.util.concurrent.CountDownLatch
 
-
 internal fun onCheckBoxClick(
     viewModel: LibPickYouViewModel,
     context: Context,

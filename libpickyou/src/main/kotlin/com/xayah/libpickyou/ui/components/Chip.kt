@@ -18,7 +18,7 @@ import com.xayah.libpickyou.ui.tokens.SizeTokens
 
 @ExperimentalMaterial3Api
 @Composable
-fun AssistChip(modifier: Modifier, icon: ImageVectorToken, text: StringResourceToken) {
+internal fun AssistChip(modifier: Modifier, icon: ImageVectorToken, text: StringResourceToken) {
     OutlinedCard(modifier = modifier, onClick = {}, content = {
         Row(
             modifier = Modifier.padding(SizeTokens.Level1),

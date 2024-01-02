@@ -2,7 +2,7 @@ package com.xayah.libpickyou
 
 import android.app.Application
 
-class PickYouApplication : Application() {
+internal class PickYouApplication : Application() {
     companion object {
         lateinit var application: Application
     }

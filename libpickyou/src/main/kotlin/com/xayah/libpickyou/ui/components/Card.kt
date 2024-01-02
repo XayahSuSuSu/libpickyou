@@ -19,7 +19,7 @@ import com.xayah.libpickyou.ui.tokens.SizeTokens
 
 @ExperimentalMaterial3Api
 @Composable
-fun PermissionCard(modifier: Modifier = Modifier, content: StringResourceToken) {
+internal fun PermissionCard(modifier: Modifier = Modifier, content: StringResourceToken) {
     Card(
         modifier = modifier
             .fillMaxWidth()

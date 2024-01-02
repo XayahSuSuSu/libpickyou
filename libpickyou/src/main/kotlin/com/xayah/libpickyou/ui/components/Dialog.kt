@@ -20,13 +20,13 @@ import kotlin.coroutines.resume
  * Creates a [DialogState] and acts as a slot with [DialogState.Insert].
  */
 @Composable
-fun rememberDialogState(): DialogState {
+internal fun rememberDialogState(): DialogState {
     val state = remember { DialogState() }
     state.Insert()
     return state
 }
 
-class DialogState {
+internal class DialogState {
     private var content: (@Composable () -> Unit)? by mutableStateOf(null)
 
     @Composable

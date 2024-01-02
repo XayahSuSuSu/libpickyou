@@ -10,7 +10,7 @@ import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.RemoteRootService
 import com.xayah.libpickyou.util.toPath
 
-data class IndexUiState(
+internal data class IndexUiState(
     val path: List<String> = LibPickYouTokens.DefaultPathList,
     val selection: List<String> = listOf(),
     val children: DirChildrenParcelable = DirChildrenParcelable(),
@@ -36,7 +36,7 @@ data class IndexUiState(
         get() = selection.joinToString(separator = LibPickYouTokens.SelectedItemsSeparator)
 }
 
-sealed class IndexUiIntent : UiIntent {
+internal sealed class IndexUiIntent : UiIntent {
     data class SetConfig(val path: List<String>, val type: PickerType, val limitation: Int, val title: String, val pathPrefixHiddenNum: Int) : IndexUiIntent()
     data class Enter(val item: String) : IndexUiIntent()
     object Exit : IndexUiIntent()

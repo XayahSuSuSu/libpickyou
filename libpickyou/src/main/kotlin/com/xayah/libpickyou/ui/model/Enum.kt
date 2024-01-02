@@ -11,5 +11,5 @@ enum class PickerType {
     BOTH
 }
 
-fun PermissionType.isRoot() = this == PermissionType.ROOT
-fun PermissionType.isStorage() = this == PermissionType.NORMAL
+internal fun PermissionType.isRoot() = this == PermissionType.ROOT
+internal fun PermissionType.isStorage() = this == PermissionType.NORMAL
