@@ -142,15 +142,15 @@ internal fun CommonScaffold(
             )
 
             Box(modifier = Modifier.weight(1f)) {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(SizeTokens.Level3)) {
+                LazyColumn {
                     item {
-                        Spacer(modifier = Modifier.size(SizeTokens.Level0))
+                        Spacer(modifier = Modifier.size(SizeTokens.Level1))
                     }
 
                     content()
 
                     item {
-                        Spacer(modifier = Modifier.size(SizeTokens.Level0))
+                        Spacer(modifier = Modifier.size(SizeTokens.Level1))
                     }
                 }
 
