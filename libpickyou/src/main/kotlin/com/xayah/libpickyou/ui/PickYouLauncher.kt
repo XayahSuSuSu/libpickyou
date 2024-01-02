@@ -24,7 +24,7 @@ import kotlin.coroutines.suspendCoroutine
 class PickYouLauncher {
     private lateinit var mLauncher: ActivityResultLauncher<Intent>
     private var mTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
-    private var mPermissionType: PermissionType = PermissionType.ROOT
+    private var mPermissionType: PermissionType = PermissionType.NORMAL
     private val mNextLocalRequestCode = AtomicInteger()
     private var mDefaultPathList = LibPickYouTokens.DefaultPathList
     private var mPickerType = PickerType.FILE
