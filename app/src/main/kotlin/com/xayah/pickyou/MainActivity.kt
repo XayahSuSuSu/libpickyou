@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.xayah.libpickyou.ui.PickYouLauncher
-import com.xayah.libpickyou.ui.activity.PickerType
+import com.xayah.libpickyou.ui.model.PickerType
 import com.xayah.pickyou.ui.theme.PickYouTheme
 import kotlinx.coroutines.launch
 

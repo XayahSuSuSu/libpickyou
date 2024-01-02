@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
@@ -36,10 +37,12 @@ internal fun BodyLargeText(text: String) {
 }
 
 @Composable
-internal fun BodyMediumText(text: String) {
+internal fun BodyMediumText(modifier: Modifier = Modifier, text: String, fontWeight: FontWeight? = null) {
     Text(
+        modifier = modifier,
         text = text,
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = fontWeight,
     )
 }
 

@@ -17,16 +17,6 @@ internal object LibPickYouTokens {
     const val PathSeparator = "/"
 
     const val IntentExtraPath = "path"
-    const val IntentExtraDefaultPathList = "defaultPathList"
-    const val IntentExtraType = "type"
-    const val IntentExtraTitle = "title"
-    const val IntentExtraLimitation = "limitation"
-    const val IntentPathPrefixHiddenNum = "pathPrefixHiddenNum"
-
-    const val EnumPickerTypeFile = "type_file"
-    const val EnumPickerTypeDirectory = "type_directory"
-    const val EnumPickerTypeBoth = "type_both"
-    const val EnumPickerTypePrefix = "type_"
 
     const val NoLimitation = 0
     const val StringPlaceHolder = ""

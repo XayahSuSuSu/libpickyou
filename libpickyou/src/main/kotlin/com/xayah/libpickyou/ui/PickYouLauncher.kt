@@ -10,7 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.activity.LibPickYouActivity
-import com.xayah.libpickyou.ui.activity.PickerType
+import com.xayah.libpickyou.ui.model.PermissionType
+import com.xayah.libpickyou.ui.model.PickerType
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.registerForActivityResultCompat
 import kotlinx.coroutines.CancellationException
@@ -21,17 +22,24 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class PickYouLauncher {
-    private lateinit var launcher: ActivityResultLauncher<Intent>
+    private lateinit var mLauncher: ActivityResultLauncher<Intent>
+    private var mTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+    private var mPermissionType: PermissionType = PermissionType.ROOT
     private val mNextLocalRequestCode = AtomicInteger()
-    private var defaultPathList = LibPickYouTokens.DefaultPathList
-    private var type = PickerType.FILE
-    private var limitation = LibPickYouTokens.NoLimitation
-    private var title = LibPickYouTokens.StringPlaceHolder
-    private var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
-    private var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+    private var mDefaultPathList = LibPickYouTokens.DefaultPathList
+    private var mPickerType = PickerType.FILE
+    private var mLimitation = LibPickYouTokens.NoLimitation
+    private var mTitle = LibPickYouTokens.StringPlaceHolder
+    private var mPathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
     companion object {
-        var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        internal var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        internal var permissionType: PermissionType = PermissionType.NORMAL
+        internal var defaultPathList = LibPickYouTokens.DefaultPathList
+        internal var pickerType = PickerType.FILE
+        internal var limitation = LibPickYouTokens.NoLimitation
+        internal var title = LibPickYouTokens.StringPlaceHolder
+        internal var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
     }
 
     private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
@@ -41,68 +49,61 @@ class PickYouLauncher {
     }
 
     /**
-     * Set the default path
+     * Set the default path.
      */
-    fun setDefaultPath(path: String) {
-        this.defaultPathList = path.split(LibPickYouTokens.PathSeparator)
-    }
+    fun setDefaultPath(path: String) { this.mDefaultPathList = path.split(LibPickYouTokens.PathSeparator) }
 
     /**
      * Set the type of PickYou.
      *
      * @param type [PickerType.FILE] | [PickerType.DIRECTORY] | [PickerType.BOTH]
      */
-    fun setType(type: PickerType) {
-        this.type = type
-    }
+    fun setType(type: PickerType) { this.mPickerType = type }
 
     /**
      * Set the limitation of PickYou.
      *
      * @param number 0: No limitation, others: The number of files/directories user can pick
      */
-    fun setLimitation(number: Int) {
-        this.limitation = number
-    }
+    fun setLimitation(number: Int) { this.mLimitation = number }
 
     /**
      * Set the title of PickYou.
      */
-    fun setTitle(title: String) {
-        this.title = title
-    }
+    fun setTitle(title: String) { this.mTitle = title }
 
     /**
      * Set prefix path hidden num.
      * This will hide path prefix on the top of the activity and the return value.
      */
-    fun setPathPrefixHiddenNum(pathPrefixHiddenNum: Int) {
-        this.pathPrefixHiddenNum = pathPrefixHiddenNum
-    }
+    fun setPathPrefixHiddenNum(pathPrefixHiddenNum: Int) { this.mPathPrefixHiddenNum = pathPrefixHiddenNum }
 
     /**
      * Set the backend of traverse.
      */
-    fun setTraverseBackend(backend: (path: Path) -> DirChildrenParcelable) {
-        this.traverseBackend = backend
-    }
+    fun setTraverseBackend(backend: (path: Path) -> DirChildrenParcelable) { this.mTraverseBackend = backend }
+
+    /**
+     * Set the permission type.
+     */
+    fun setPermissionType(type: PermissionType) { this.mPermissionType = type }
 
     private fun launch(context: Context) {
-        val intent = Intent(context, LibPickYouActivity::class.java)
-        intent.putExtra(LibPickYouTokens.IntentExtraType, type.type)
-        intent.putExtra(LibPickYouTokens.IntentExtraLimitation, limitation)
-        intent.putExtra(LibPickYouTokens.IntentExtraTitle, title)
-        intent.putExtra(LibPickYouTokens.IntentPathPrefixHiddenNum, pathPrefixHiddenNum)
-        intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraDefaultPathList, ArrayList(defaultPathList))
-        PickYouLauncher.traverseBackend = this.traverseBackend
-        launcher.launch(intent)
+        traverseBackend = mTraverseBackend
+        permissionType = mPermissionType
+        pickerType = mPickerType
+        limitation = mLimitation
+        title = mTitle
+        pathPrefixHiddenNum = mPathPrefixHiddenNum
+        defaultPathList = mDefaultPathList
+        mLauncher.launch(Intent(context, LibPickYouActivity::class.java))
     }
 
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
     fun launch(context: Context, onResult: (path: List<String>) -> Unit) {
-        launcher =
+        mLauncher =
             context.registerForActivityResultCompat(
                 mNextLocalRequestCode,
                 ActivityResultContracts.StartActivityForResult()
@@ -115,18 +116,16 @@ class PickYouLauncher {
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
-    fun launch(componentActivity: ComponentActivity, onResult: (path: List<String>) -> Unit) =
-        launch(context = componentActivity, onResult)
+    fun launch(componentActivity: ComponentActivity, onResult: (path: List<String>) -> Unit) = launch(context = componentActivity, onResult)
 
     /**
      * Launch PickYou immediately, you can do anything in [onResult] with the picked path.
      */
-    fun launch(fragment: Fragment, onResult: (path: List<String>) -> Unit) =
-        launch(fragment.requireContext(), onResult)
+    fun launch(fragment: Fragment, onResult: (path: List<String>) -> Unit) = launch(fragment.requireContext(), onResult)
 
     suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
         // There is no cancellation support since we cannot cancel a launched Intent
-        launcher =
+        mLauncher =
             context.registerForActivityResultCompat(
                 mNextLocalRequestCode,
                 ActivityResultContracts.StartActivityForResult()

@@ -8,4 +8,7 @@
     <string name="selection_empty">Selection is empty</string>
     <string name="max_limitation">Max limitation</string>
     <string name="confirm_your_selections">Confirm your selections</string>
+    <string name="necessary_permissions">Necessary permissions</string>
+    <string name="storage">Storage</string>
+    <string name="failed_to_grant_permission">Failed to grant permission!</string>
 </resources>

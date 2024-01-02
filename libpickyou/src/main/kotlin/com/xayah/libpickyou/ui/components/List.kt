@@ -12,6 +12,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,16 +20,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
+import com.xayah.libpickyou.ui.activity.IndexUiIntent
 import com.xayah.libpickyou.ui.activity.LibPickYouViewModel
-import com.xayah.libpickyou.ui.activity.PickerType
 import com.xayah.libpickyou.ui.animation.CrossFade
+import com.xayah.libpickyou.ui.model.PickerType
+import com.xayah.libpickyou.ui.model.isRoot
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.DateUtil
 import com.xayah.libpickyou.util.PathUtil
+import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.toPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,18 +47,18 @@ internal fun onCheckBoxClick(
     isChecked: MutableState<Boolean>?,
     checked: Boolean
 ) {
-    val uiState by viewModel.uiState
+    val uiState = viewModel.uiState.value
     val limitation = uiState.limitation
     if (checked) {
         if (limitation == LibPickYouTokens.NoLimitation || viewModel.uiState.value.selection.size < limitation) {
-            viewModel.addSelection(name)
+            viewModel.emitIntent(IndexUiIntent.JoinSelection(name))
             isChecked?.value = true
         } else {
             Toast.makeText(context, "${context.getString(R.string.max_limitation)}: $limitation", Toast.LENGTH_SHORT)
                 .show()
         }
     } else {
-        viewModel.removeSelection(name)
+        viewModel.emitIntent(IndexUiIntent.RemoveSelection(name))
         isChecked?.value = false
     }
 }
@@ -63,10 +66,10 @@ internal fun onCheckBoxClick(
 @ExperimentalAnimationApi
 @Composable
 internal fun ContentList(viewModel: LibPickYouViewModel) {
-    val uiState by viewModel.uiState
+    val uiState by viewModel.uiState.collectAsState()
 
     BackHandler(uiState.canUp) {
-        viewModel.exit()
+        viewModel.emitIntent(IndexUiIntent.Exit)
     }
 
     val progressVisible = remember { mutableStateOf(true) }
@@ -91,12 +94,14 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                 withContext(Dispatchers.Main) {
                     val children: DirChildrenParcelable
                     val path = Paths.get(uiState.path.toPath())
-                    children = PickYouLauncher.traverseBackend?.invoke(path) ?: if (Shell.getShell().isRoot) {
-                        viewModel.remoteRootService.traverse(path)
-                    } else {
-                        PathUtil.traverse(path)
-                    }
-                    viewModel.updateChildren(children)
+                    children =
+                        PickYouLauncher.traverseBackend?.invoke(path)
+                            ?: if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) {
+                                viewModel.remoteRootService.traverse(path)
+                            } else {
+                                PathUtil.traverse(path)
+                            }
+                    viewModel.emitIntent(IndexUiIntent.UpdateChildren(children))
                     progressVisible.value = false
                 }
             }
@@ -126,11 +131,11 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                     if (uiState.canUp)
                         item {
                             ChildReturnListItem {
-                                viewModel.exit()
+                                viewModel.emitIntent(IndexUiIntent.Exit)
                             }
                         }
                     items(items = uiState.children.directories, key = { it.name }) {
-                        val isChecked = when (viewModel.uiState.value.type) {
+                        val isChecked = when (uiState.type) {
                             PickerType.DIRECTORY, PickerType.BOTH -> {
                                 remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
                             }
@@ -153,14 +158,14 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                             },
                             onItemClick = {
                                 if (it.link.isNullOrEmpty().not())
-                                    viewModel.jumpPath(it.link!!)
+                                    viewModel.emitIntent(IndexUiIntent.JumpTo(it.link!!))
                                 else
-                                    viewModel.enter(it.name)
+                                    viewModel.emitIntent(IndexUiIntent.Enter(it.name))
                             }
                         )
                     }
                     items(items = uiState.children.files, key = { it.name }) {
-                        val isChecked = when (viewModel.uiState.value.type) {
+                        val isChecked = when (uiState.type) {
                             PickerType.FILE, PickerType.BOTH -> {
                                 remember { mutableStateOf(viewModel.isItemSelected(it.name)) }
                             }

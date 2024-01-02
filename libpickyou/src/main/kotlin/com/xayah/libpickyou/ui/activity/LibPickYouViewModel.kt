@@ -1,33 +1,16 @@
 package com.xayah.libpickyou.ui.activity
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
+import com.xayah.libpickyou.ui.PickYouLauncher
+import com.xayah.libpickyou.ui.model.PickerType
+import com.xayah.libpickyou.ui.model.isRoot
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
+import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.RemoteRootService
 import com.xayah.libpickyou.util.toPath
 
-enum class PickerType(val type: String) {
-    FILE(LibPickYouTokens.EnumPickerTypeFile),
-    DIRECTORY(LibPickYouTokens.EnumPickerTypeDirectory),
-    BOTH(LibPickYouTokens.EnumPickerTypeBoth);
-
-    companion object {
-        fun of(name: String?): PickerType {
-            return try {
-                PickerType.valueOf(name!!.replace(LibPickYouTokens.EnumPickerTypePrefix, "").uppercase())
-            } catch (e: Exception) {
-                e.printStackTrace()
-                FILE
-            }
-        }
-    }
-}
-
-internal data class PickYouUiState(
+data class IndexUiState(
     val path: List<String> = LibPickYouTokens.DefaultPathList,
     val selection: List<String> = listOf(),
     val children: DirChildrenParcelable = DirChildrenParcelable(),
@@ -36,7 +19,7 @@ internal data class PickYouUiState(
     val limitation: Int = LibPickYouTokens.NoLimitation,
     val title: String = LibPickYouTokens.StringPlaceHolder,
     val pathPrefixHiddenNum: Int = LibPickYouTokens.PathPrefixHiddenNum,
-) {
+) : UiState {
     val canUp: Boolean
         get() = isAccessible(path.toMutableList().apply { removeLast() })
 
@@ -51,77 +34,87 @@ internal data class PickYouUiState(
 
     val selectedItems: String
         get() = selection.joinToString(separator = LibPickYouTokens.SelectedItemsSeparator)
-    val selectedItemsInLine: String
-        get() = selection.joinToString(separator = LibPickYouTokens.SelectedItemsInLineSeparator)
 }
 
-internal class LibPickYouViewModel : ViewModel() {
-    private val _uiState = mutableStateOf(PickYouUiState())
-    val uiState: State<PickYouUiState>
-        get() = _uiState
+sealed class IndexUiIntent : UiIntent {
+    data class SetConfig(val path: List<String>, val type: PickerType, val limitation: Int, val title: String, val pathPrefixHiddenNum: Int) : IndexUiIntent()
+    data class Enter(val item: String) : IndexUiIntent()
+    object Exit : IndexUiIntent()
+    data class JumpToList(val target: List<String>) : IndexUiIntent()
+    data class JumpTo(val target: String) : IndexUiIntent()
+    data class UpdateChildren(val children: DirChildrenParcelable) : IndexUiIntent()
+    data class JoinSelection(val name: String) : IndexUiIntent()
+    data class RemoveSelection(val name: String) : IndexUiIntent()
+
+}
+
+internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, IndexUiEffect>(IndexUiState()) {
     lateinit var remoteRootService: RemoteRootService
 
-    fun setDefaultPathList(path: List<String>) {
-        _uiState.value = uiState.value.copy(path = path)
-    }
+    override suspend fun onEvent(state: IndexUiState, intent: IndexUiIntent) {
+        when (intent) {
+            is IndexUiIntent.SetConfig -> {
+                emitState(
+                    state.copy(
+                        path = intent.path,
+                        type = intent.type,
+                        limitation = intent.limitation,
+                        title = intent.title,
+                        pathPrefixHiddenNum = intent.pathPrefixHiddenNum,
+                    )
+                )
+            }
 
-    fun setPickerType(type: PickerType) {
-        _uiState.value = uiState.value.copy(type = type)
-    }
+            is IndexUiIntent.Enter -> {
+                if (intent.item.isEmpty()) return
+                val path = state.path.toMutableList()
+                path.add(intent.item)
+                emitState(state.copy(path = path.toList()))
+            }
 
-    fun setLimitation(number: Int) {
-        _uiState.value = uiState.value.copy(limitation = number)
-    }
+            is IndexUiIntent.Exit -> {
+                if (!state.canUp) return
+                val path = state.path.toMutableList()
+                path.removeLast()
+                onAccessible(path) {
+                    emitState(state.copy(path = path.toList()))
+                }
+            }
 
-    fun setTitle(title: String) {
-        _uiState.value = uiState.value.copy(title = title)
-    }
+            is IndexUiIntent.JumpToList -> {
+                if (intent.target.isEmpty()) return
+                onAccessible(intent.target) {
+                    emitState(state.copy(path = intent.target))
+                }
+            }
 
-    fun setPathPrefixHiddenNum(number: Int) {
-        _uiState.value = uiState.value.copy(pathPrefixHiddenNum = number)
-    }
+            is IndexUiIntent.JumpTo -> {
+                emitIntent(IndexUiIntent.JumpToList(intent.target.split(LibPickYouTokens.PathSeparator)))
+            }
 
-    fun enter(item: String): Boolean {
-        val uiState by uiState
+            is IndexUiIntent.UpdateChildren -> {
+                emitState(state.copy(children = intent.children))
+            }
 
-        if (item.isEmpty()) return false
-        val path = uiState.path.toMutableList()
-        path.add(item)
-        _uiState.value = uiState.copy(path = path.toList())
-        return true
-    }
+            is IndexUiIntent.JoinSelection -> {
+                if (intent.name.isEmpty() || isItemSelected(intent.name)) return
+                val selection = state.selection.toMutableList()
+                selection.add(getPathString(intent.name))
+                emitState(state.copy(selection = selection.toList()))
+            }
 
-    fun exit(): Boolean {
-        val uiState by uiState
-        if (!uiState.canUp) return false
-        val path = uiState.path.toMutableList()
-        path.removeLast()
-        onAccessible(path) {
-            _uiState.value = uiState.copy(path = path.toList())
+            is IndexUiIntent.RemoveSelection -> {
+                val index = state.selection.indexOf(getPathString(intent.name))
+                if (index == -1) return
+                val selection = state.selection.toMutableList()
+                selection.removeAt(index)
+                emitState(state.copy(selection = selection.toList()))
+            }
         }
-        return true
-    }
-
-    fun jumpPath(newPath: List<String>): Boolean {
-        val uiState by uiState
-
-        if (newPath.isEmpty()) return false
-        onAccessible(newPath) {
-            _uiState.value = uiState.copy(path = newPath)
-        }
-        return true
-    }
-
-    fun jumpPath(newPath: String): Boolean {
-        return jumpPath(newPath.split(LibPickYouTokens.PathSeparator))
-    }
-
-    fun updateChildren(children: DirChildrenParcelable) {
-        _uiState.value = uiState.value.copy(children = children)
     }
 
     private fun getPathString(name: String? = null): String {
-        val uiState by uiState
+        val uiState = uiState.value
 
         return if (!name.isNullOrEmpty()) {
             "${uiState.pathString}/$name"
@@ -133,27 +126,6 @@ internal class LibPickYouViewModel : ViewModel() {
         return uiState.value.selection.indexOf(getPathString(name)) != -1
     }
 
-    fun addSelection(name: String): Boolean {
-        val uiState by uiState
-
-        if (name.isEmpty() || isItemSelected(name)) return false
-        val selection = uiState.selection.toMutableList()
-        selection.add(getPathString(name))
-        _uiState.value = uiState.copy(selection = selection.toList())
-        return true
-    }
-
-    fun removeSelection(name: String): Boolean {
-        val uiState by uiState
-
-        val index = uiState.selection.indexOf(getPathString(name))
-        if (index == -1) return false
-        val selection = uiState.selection.toMutableList()
-        selection.removeAt(index)
-        _uiState.value = uiState.copy(selection = selection.toList())
-        return true
-    }
-
     private fun onAccessible(path: List<String>, block: () -> Unit) {
         if (isAccessible(path)) block()
     }
@@ -163,5 +135,5 @@ private fun isAccessible(path: List<String>): Boolean {
     if (path.isEmpty()) return false
     val defaultPath = LibPickYouTokens.DefaultPathList.toPath()
     if (defaultPath in path.toPath()) return true
-    return Shell.getShell().isRoot
+    return if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) Shell.getShell().isRoot else false
 }

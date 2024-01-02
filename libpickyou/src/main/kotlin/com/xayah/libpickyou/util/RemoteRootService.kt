@@ -9,6 +9,7 @@ import android.os.Parcel
 import android.os.ParcelFileDescriptor
 import android.os.RemoteException
 import android.widget.Toast
+import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ipc.RootService
 import com.xayah.libpickyou.IRemoteRootService
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
@@ -24,6 +25,31 @@ import kotlin.io.path.pathString
 internal class RemoteRootService(private val context: Context) {
     private var mService: IRemoteRootService? = null
     private var isFirstConnection = true
+
+    companion object {
+        private fun getShellBuilder() = Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
+            .setInitializers(EnvInitializer::class.java)
+            .setTimeout(3)
+
+        fun initService() = Shell.setDefaultBuilder(getShellBuilder())
+    }
+
+    private class EnvInitializer : Shell.Initializer() {
+        companion object {
+            fun initShell(shell: Shell) {
+                shell.newJob()
+                    .add("nsenter -t 1 -m su") // Switch to global namespace
+                    .add("set -o pipefail") // Ensure that the exit code of each command is correct.
+                    .exec()
+            }
+        }
+
+        override fun onInit(context: Context, shell: Shell): Boolean {
+            initShell(shell)
+            return true
+        }
+    }
 
     class RemoteRootService : RootService() {
         override fun onBind(intent: Intent): IBinder {

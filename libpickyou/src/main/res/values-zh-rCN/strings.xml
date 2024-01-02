@@ -7,4 +7,7 @@
     <string name="selection_empty">选择为空</string>
     <string name="max_limitation">最大限制</string>
     <string name="confirm_your_selections">确认你的选择</string>
+    <string name="necessary_permissions">必要权限</string>
+    <string name="storage">存储</string>
+    <string name="failed_to_grant_permission">权限获取失败!</string>
 </resources>

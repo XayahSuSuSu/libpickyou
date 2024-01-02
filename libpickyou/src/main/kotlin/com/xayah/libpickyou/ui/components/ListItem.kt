@@ -59,7 +59,7 @@ internal fun ChildListItem(
             Column(modifier = Modifier.weight(1f)) {
                 BodyLargeText(title)
                 if (subtitle != null)
-                    BodyMediumText(subtitle)
+                    BodyMediumText(text = subtitle)
             }
             if (isChecked != null && onCheckBoxClick != null)
                 Checkbox(
