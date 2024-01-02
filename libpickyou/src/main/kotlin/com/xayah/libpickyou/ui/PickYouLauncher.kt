@@ -55,6 +55,27 @@ class PickYouLauncher {
                 launch(Intent(context, LibPickYouActivity::class.java))
             }
         }
+
+        suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
+            context.registerForActivityResultCompat(
+                AtomicInteger(),
+                ActivityResultContracts.StartActivityForResult()
+            ) { result: ActivityResult ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val r = result.data?.getStringArrayListExtra(LibPickYouTokens.IntentExtraPath)
+                        ?.toList()?.takeIf { it.isNotEmpty() }
+                    if (r != null) {
+                        cont.resume(r)
+                    } else {
+                        cont.resumeWithException(CancellationException("Launcher returned empty list."))
+                    }
+                } else if (result.resultCode == Activity.RESULT_CANCELED) {
+                    cont.resumeWithException(CancellationException("Launcher got cancelled."))
+                }
+            }.apply {
+                launch(Intent(context, LibPickYouActivity::class.java))
+            }
+        }
     }
 
     /**
