@@ -1,7 +1,6 @@
 package com.xayah.libpickyou.ui.components
 
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
@@ -23,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
+import com.xayah.libpickyou.ui.activity.IndexUiEffect
 import com.xayah.libpickyou.ui.activity.IndexUiIntent
 import com.xayah.libpickyou.ui.activity.LibPickYouViewModel
 import com.xayah.libpickyou.ui.animation.CrossFade
@@ -53,8 +53,8 @@ internal fun onCheckBoxClick(
             viewModel.emitIntent(IndexUiIntent.JoinSelection(name))
             isChecked?.value = true
         } else {
-            Toast.makeText(context, "${context.getString(R.string.max_limitation)}: $limitation", Toast.LENGTH_SHORT)
-                .show()
+            viewModel.emitEffect(IndexUiEffect.DismissSnackbar)
+            viewModel.emitEffect(IndexUiEffect.ShowSnackbar("${context.getString(R.string.max_limitation)}: $limitation"))
         }
     } else {
         viewModel.emitIntent(IndexUiIntent.RemoveSelection(name))
