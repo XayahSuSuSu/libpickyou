@@ -67,6 +67,7 @@ internal class LibPickYouActivity : ComponentActivity() {
                     val intent = Intent()
                     intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraPath, ArrayList(viewModel.uiState.value.selection))
                     setResult(Activity.RESULT_OK, intent)
+                    viewModel.remoteRootService.destroyService()
                     finish()
                 }
                 val onPermissionsChanged: () -> Unit = {
