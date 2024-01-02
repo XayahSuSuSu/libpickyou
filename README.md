@@ -60,10 +60,10 @@ launcher.launch(context) { path ->
 
 2. Customization
 
-See [PickYouLauncher](./libpickyou/src/main/java/com/xayah/libpickyou/ui/PickYouLauncher.kt)
+See [PickYouLauncher](./libpickyou/src/main/kotlin/com/xayah/libpickyou/ui/PickYouLauncher.kt)
 
 ## Sample
-See [sample](./app/src/main/java/com/xayah/pickyou/MainActivity.kt)
+See [sample](./app/src/main/kotlin/com/xayah/pickyou/MainActivity.kt)
 
 ## Credits
 - [libsu](https://github.com/topjohnwu/libsu)
