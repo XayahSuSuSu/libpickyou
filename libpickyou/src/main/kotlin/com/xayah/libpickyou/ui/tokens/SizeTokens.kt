@@ -11,4 +11,5 @@ internal object SizeTokens {
     val Level5 = 32.dp
     val Level6 = 48.dp
     val Level7 = 56.dp
+    val Level8 = 64.dp
 }

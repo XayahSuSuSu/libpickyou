@@ -21,6 +21,7 @@ internal data class IndexUiState(
     val limitation: Int,
     val title: String,
     val pathPrefixHiddenNum: Int,
+    val exceptionMessage: String? = null,
 ) : UiState {
     val canUp: Boolean
         get() = isAccessible(path.toMutableList().apply { removeLast() })

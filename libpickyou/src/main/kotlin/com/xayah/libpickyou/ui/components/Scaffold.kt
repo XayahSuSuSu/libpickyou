@@ -1,6 +1,5 @@
 package com.xayah.libpickyou.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavHostController
 import com.xayah.libpickyou.R
+import com.xayah.libpickyou.ui.activity.IndexUiEffect
 import com.xayah.libpickyou.ui.activity.IndexUiIntent
 import com.xayah.libpickyou.ui.activity.LibPickYouViewModel
 import com.xayah.libpickyou.ui.model.ImageVectorToken
@@ -87,10 +87,10 @@ internal fun PickYouScaffold(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    if (uiState.selectedItems.isEmpty())
-                        Toast.makeText(context, context.getString(R.string.selection_empty), Toast.LENGTH_SHORT)
-                            .show()
-                    else navController.navigate(PickYouRoutes.Selection.route)
+                    if (uiState.selectedItems.isEmpty()) {
+                        viewModel.emitEffect(IndexUiEffect.DismissSnackbar)
+                        viewModel.emitEffect(IndexUiEffect.ShowSnackbar(context.getString(R.string.selection_empty)))
+                    } else navController.navigate(PickYouRoutes.Selection.route)
                 },
                 icon = { Icon(imageVector = Icons.Rounded.Check, contentDescription = null) },
                 text = { Text(text = stringResource(R.string.pick)) },
