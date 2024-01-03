@@ -90,19 +90,16 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                 // Wait for content animation
                 contentLatch.value.await()
 
-                withContext(Dispatchers.Main) {
-                    val children: DirChildrenParcelable
-                    val path = Paths.get(uiState.path.toPath())
-                    children =
-                        PickYouLauncher.traverseBackend?.invoke(path)
-                            ?: if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) {
-                                viewModel.remoteRootService.traverse(path)
-                            } else {
-                                PathUtil.traverse(path)
-                            }
-                    viewModel.emitIntent(IndexUiIntent.UpdateChildren(children))
-                    progressVisible.value = false
-                }
+                val children: DirChildrenParcelable
+                val path = Paths.get(uiState.path.toPath())
+                children = PickYouLauncher.traverseBackend?.invoke(path)
+                    ?: if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) {
+                        viewModel.remoteRootService.traverse(path)
+                    } else {
+                        PathUtil.traverse(path)
+                    }
+                viewModel.emitIntent(IndexUiIntent.UpdateChildren(children))
+                progressVisible.value = false
             }
 
             contentLatch.value = CountDownLatch(1)
