@@ -34,13 +34,13 @@ class PickYouLauncher {
     private var mPathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
     companion object {
-        var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
-        var permissionType: PermissionType = PermissionType.NORMAL
-        var defaultPathList = LibPickYouTokens.DefaultPathList
-        var pickerType = PickerType.FILE
-        var limitation = LibPickYouTokens.NoLimitation
-        var title = LibPickYouTokens.StringPlaceHolder
-        var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
+        internal var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        internal var permissionType: PermissionType = PermissionType.NORMAL
+        internal var defaultPathList = LibPickYouTokens.DefaultPathList
+        internal var pickerType = PickerType.FILE
+        internal var limitation = LibPickYouTokens.NoLimitation
+        internal var title = LibPickYouTokens.StringPlaceHolder
+        internal var pathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
         private fun onResult(result: ActivityResult, onResult: (path: List<String>) -> Unit) {
             if (result.resultCode == Activity.RESULT_OK) {
@@ -74,13 +74,35 @@ class PickYouLauncher {
                 }
             }
 
+        var sTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        var sPermissionType: PermissionType = PermissionType.NORMAL
+        var sDefaultPathList = LibPickYouTokens.DefaultPathList
+        var sPickerType = PickerType.FILE
+        var sLimitation = LibPickYouTokens.NoLimitation
+        var sTitle = LibPickYouTokens.StringPlaceHolder
+        var sPathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
+
         fun launch(context: Context, onPathResult: (path: List<String>) -> Unit) {
+            traverseBackend = sTraverseBackend
+            permissionType = sPermissionType
+            pickerType = sPickerType
+            limitation = sLimitation
+            title = sTitle
+            pathPrefixHiddenNum = sPathPrefixHiddenNum
+            defaultPathList = sDefaultPathList
             getLauncher(context, AtomicInteger(), onPathResult).apply {
                 launch(Intent(context, LibPickYouActivity::class.java))
             }
         }
 
         suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
+            traverseBackend = sTraverseBackend
+            permissionType = sPermissionType
+            pickerType = sPickerType
+            limitation = sLimitation
+            title = sTitle
+            pathPrefixHiddenNum = sPathPrefixHiddenNum
+            defaultPathList = sDefaultPathList
             getLauncher(context, AtomicInteger(), cont).apply {
                 launch(Intent(context, LibPickYouActivity::class.java))
             }
