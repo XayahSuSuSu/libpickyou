@@ -25,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
@@ -148,7 +149,8 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .paddingHorizontal(SizeTokens.Level3),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(SizeTokens.Level3)
                         ) {
@@ -157,7 +159,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                                 contentDescription = null,
                                 modifier = Modifier.size(SizeTokens.Level8)
                             )
-                            LabelSmallText(text = uiState.exceptionMessage!!)
+                            LabelSmallText(text = uiState.exceptionMessage!!, textAlign = TextAlign.Center)
                         }
                     }
                 } else {

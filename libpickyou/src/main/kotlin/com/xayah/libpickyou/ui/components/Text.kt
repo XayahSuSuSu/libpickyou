@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
@@ -47,10 +48,11 @@ internal fun BodyMediumText(modifier: Modifier = Modifier, text: String, fontWei
 }
 
 @Composable
-internal fun LabelSmallText(modifier: Modifier = Modifier, text: String) {
+internal fun LabelSmallText(modifier: Modifier = Modifier, text: String, textAlign: TextAlign? = null) {
     Text(
         modifier = modifier,
         text = text,
-        style = MaterialTheme.typography.labelSmall
+        style = MaterialTheme.typography.labelSmall,
+        textAlign = textAlign,
     )
 }
