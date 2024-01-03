@@ -45,7 +45,15 @@ import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.RemoteRootService
 
 internal class LibPickYouActivity : ComponentActivity() {
-    private val viewModel: LibPickYouViewModel by viewModels()
+    private val viewModel: LibPickYouViewModel by viewModels {
+        LibPickYouViewModel.Companion.Factory(
+            path = PickYouLauncher.defaultPathList,
+            type = PickYouLauncher.pickerType,
+            limitation = PickYouLauncher.limitation,
+            title = PickYouLauncher.title,
+            pathPrefixHiddenNum = PickYouLauncher.pathPrefixHiddenNum,
+        )
+    }
     private var firstResume = true
 
     @ExperimentalPermissionsApi
@@ -100,15 +108,6 @@ internal class LibPickYouActivity : ComponentActivity() {
                 }
 
                 LaunchedEffect(null) {
-                    viewModel.emitIntent(
-                        IndexUiIntent.SetConfig(
-                            path = PickYouLauncher.defaultPathList,
-                            type = PickYouLauncher.pickerType,
-                            limitation = PickYouLauncher.limitation,
-                            title = PickYouLauncher.title,
-                            pathPrefixHiddenNum = PickYouLauncher.pathPrefixHiddenNum,
-                        )
-                    )
                     viewModel.remoteRootService = RemoteRootService(this@LibPickYouActivity)
                 }
 

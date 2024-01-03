@@ -27,6 +27,7 @@ class PickYouLauncher {
     private var mTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
     private var mPermissionType: PermissionType = PermissionType.NORMAL
     private val mNextLocalRequestCode = AtomicInteger()
+    private var mRootPathList = LibPickYouTokens.DefaultPathList
     private var mDefaultPathList = LibPickYouTokens.DefaultPathList
     private var mPickerType = PickerType.FILE
     private var mLimitation = LibPickYouTokens.NoLimitation
@@ -36,6 +37,7 @@ class PickYouLauncher {
     companion object {
         internal var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
         internal var permissionType: PermissionType = PermissionType.NORMAL
+        internal var rootPathList = LibPickYouTokens.DefaultPathList
         internal var defaultPathList = LibPickYouTokens.DefaultPathList
         internal var pickerType = PickerType.FILE
         internal var limitation = LibPickYouTokens.NoLimitation
@@ -76,6 +78,7 @@ class PickYouLauncher {
 
         var sTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
         var sPermissionType: PermissionType = PermissionType.NORMAL
+        var sRootPathList = LibPickYouTokens.DefaultPathList
         var sDefaultPathList = LibPickYouTokens.DefaultPathList
         var sPickerType = PickerType.FILE
         var sLimitation = LibPickYouTokens.NoLimitation
@@ -90,6 +93,7 @@ class PickYouLauncher {
             title = sTitle
             pathPrefixHiddenNum = sPathPrefixHiddenNum
             defaultPathList = sDefaultPathList
+            rootPathList = sRootPathList
             getLauncher(context, AtomicInteger(), onPathResult).apply {
                 launch(Intent(context, LibPickYouActivity::class.java))
             }
@@ -103,6 +107,7 @@ class PickYouLauncher {
             title = sTitle
             pathPrefixHiddenNum = sPathPrefixHiddenNum
             defaultPathList = sDefaultPathList
+            rootPathList = sRootPathList
             getLauncher(context, AtomicInteger(), cont).apply {
                 launch(Intent(context, LibPickYouActivity::class.java))
             }
@@ -112,14 +117,25 @@ class PickYouLauncher {
     /**
      * Set the default path.
      */
-    fun setDefaultPath(path: String) { this.mDefaultPathList = path.split(LibPickYouTokens.PathSeparator) }
+    fun setDefaultPath(path: String) {
+        this.mDefaultPathList = path.split(LibPickYouTokens.PathSeparator)
+    }
+
+    /**
+     * Set the root path.
+     */
+    fun setRootPath(path: String) {
+        this.mRootPathList = path.split(LibPickYouTokens.PathSeparator)
+    }
 
     /**
      * Set the type of PickYou.
      *
      * @param type [PickerType.FILE] | [PickerType.DIRECTORY] | [PickerType.BOTH]
      */
-    fun setType(type: PickerType) { this.mPickerType = type }
+    fun setType(type: PickerType) {
+        this.mPickerType = type
+    }
 
     /**
      * Set the limitation of PickYou.
@@ -157,6 +173,7 @@ class PickYouLauncher {
         title = mTitle
         pathPrefixHiddenNum = mPathPrefixHiddenNum
         defaultPathList = mDefaultPathList
+        rootPathList = mRootPathList
         mLauncher.launch(Intent(context, LibPickYouActivity::class.java))
     }
 

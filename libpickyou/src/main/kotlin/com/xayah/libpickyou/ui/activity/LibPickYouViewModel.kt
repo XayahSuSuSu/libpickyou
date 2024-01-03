@@ -1,5 +1,8 @@
 package com.xayah.libpickyou.ui.activity
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
@@ -11,14 +14,13 @@ import com.xayah.libpickyou.util.RemoteRootService
 import com.xayah.libpickyou.util.toPath
 
 internal data class IndexUiState(
-    val path: List<String> = LibPickYouTokens.DefaultPathList,
+    val path: List<String>,
     val selection: List<String> = listOf(),
     val children: DirChildrenParcelable = DirChildrenParcelable(),
-    val type: PickerType = PickerType.FILE,
-
-    val limitation: Int = LibPickYouTokens.NoLimitation,
-    val title: String = LibPickYouTokens.StringPlaceHolder,
-    val pathPrefixHiddenNum: Int = LibPickYouTokens.PathPrefixHiddenNum,
+    val type: PickerType,
+    val limitation: Int,
+    val title: String,
+    val pathPrefixHiddenNum: Int,
 ) : UiState {
     val canUp: Boolean
         get() = isAccessible(path.toMutableList().apply { removeLast() })
@@ -37,7 +39,6 @@ internal data class IndexUiState(
 }
 
 internal sealed class IndexUiIntent : UiIntent {
-    data class SetConfig(val path: List<String>, val type: PickerType, val limitation: Int, val title: String, val pathPrefixHiddenNum: Int) : IndexUiIntent()
     data class Enter(val item: String) : IndexUiIntent()
     object Exit : IndexUiIntent()
     data class JumpToList(val target: List<String>) : IndexUiIntent()
@@ -48,23 +49,46 @@ internal sealed class IndexUiIntent : UiIntent {
 
 }
 
-internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, IndexUiEffect>(IndexUiState()) {
+internal class LibPickYouViewModel(
+    path: List<String>,
+    type: PickerType,
+    limitation: Int,
+    title: String,
+    pathPrefixHiddenNum: Int,
+) : BaseViewModel<IndexUiState, IndexUiIntent, IndexUiEffect>(
+    IndexUiState(
+        path = path,
+        type = type,
+        limitation = limitation,
+        title = title,
+        pathPrefixHiddenNum = pathPrefixHiddenNum
+    )
+) {
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        class Factory(
+            private val path: List<String>,
+            private val type: PickerType,
+            private val limitation: Int,
+            private val title: String,
+            private val pathPrefixHiddenNum: Int,
+        ) : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                return LibPickYouViewModel(
+                    path = path,
+                    type = type,
+                    limitation = limitation,
+                    title = title,
+                    pathPrefixHiddenNum = pathPrefixHiddenNum
+                ) as T
+            }
+        }
+    }
+
     lateinit var remoteRootService: RemoteRootService
 
     override suspend fun onEvent(state: IndexUiState, intent: IndexUiIntent) {
         when (intent) {
-            is IndexUiIntent.SetConfig -> {
-                emitState(
-                    state.copy(
-                        path = intent.path,
-                        type = intent.type,
-                        limitation = intent.limitation,
-                        title = intent.title,
-                        pathPrefixHiddenNum = intent.pathPrefixHiddenNum,
-                    )
-                )
-            }
-
             is IndexUiIntent.Enter -> {
                 if (intent.item.isEmpty()) return
                 val path = state.path.toMutableList()
@@ -133,7 +157,7 @@ internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, 
 
 private fun isAccessible(path: List<String>): Boolean {
     if (path.isEmpty()) return false
-    val defaultPath = LibPickYouTokens.DefaultPathList.toPath()
-    if (defaultPath in path.toPath()) return true
+    val rootPath = PickYouLauncher.rootPathList.toPath()
+    if (rootPath in path.toPath()) return true
     return if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) Shell.getShell().isRoot else false
 }
