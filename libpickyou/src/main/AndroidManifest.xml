@@ -9,7 +9,6 @@
         tools:ignore="ScopedStorage" />
 
     <application
-        android:name=".PickYouApplication"
         android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="true">
         <activity
