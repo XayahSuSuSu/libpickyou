@@ -7,9 +7,7 @@ import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
 import com.xayah.libpickyou.ui.model.PickerType
-import com.xayah.libpickyou.ui.model.isRoot
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
-import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.RemoteRootService
 import com.xayah.libpickyou.util.toPath
 
@@ -22,6 +20,7 @@ internal data class IndexUiState(
     val title: String,
     val pathPrefixHiddenNum: Int,
     val exceptionMessage: String? = null,
+    val refreshState: Boolean,
 ) : UiState {
     val canUp: Boolean
         get() = isAccessible(path.toMutableList().apply { removeLast() })
@@ -47,6 +46,7 @@ internal sealed class IndexUiIntent : UiIntent {
     data class UpdateChildren(val children: DirChildrenParcelable) : IndexUiIntent()
     data class JoinSelection(val name: String) : IndexUiIntent()
     data class RemoveSelection(val name: String) : IndexUiIntent()
+    object Refresh : IndexUiIntent()
 
 }
 
@@ -62,7 +62,8 @@ internal class LibPickYouViewModel(
         type = type,
         limitation = limitation,
         title = title,
-        pathPrefixHiddenNum = pathPrefixHiddenNum
+        pathPrefixHiddenNum = pathPrefixHiddenNum,
+        refreshState = true
     )
 ) {
     companion object {
@@ -135,6 +136,10 @@ internal class LibPickYouViewModel(
                 selection.removeAt(index)
                 emitState(state.copy(selection = selection.toList()))
             }
+
+            is IndexUiIntent.Refresh -> {
+                emitState(state.copy(refreshState = state.refreshState.not()))
+            }
         }
     }
 
@@ -160,5 +165,5 @@ private fun isAccessible(path: List<String>): Boolean {
     if (path.isEmpty()) return false
     val rootPath = PickYouLauncher.rootPathList.toPath()
     if (rootPath in path.toPath()) return true
-    return if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) Shell.getShell().isRoot else false
+    return if (PickYouLauncher.isRootMode) Shell.getShell().isRoot else false
 }

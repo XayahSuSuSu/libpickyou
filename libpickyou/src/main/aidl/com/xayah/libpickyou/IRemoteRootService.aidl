@@ -2,4 +2,5 @@ package com.xayah.libpickyou;
 
 interface IRemoteRootService {
     ParcelFileDescriptor traverse(String path);
+    boolean mkdirs(String src);
 }

@@ -58,6 +58,7 @@ internal fun PickYouScaffold(
     navController: NavHostController,
     viewModel: LibPickYouViewModel,
     onResult: () -> Unit,
+    onAdd: () -> Unit,
     content: @Composable () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -78,6 +79,9 @@ internal fun PickYouScaffold(
                 path = uiState.path,
                 pathPrefixHiddenNum = uiState.pathPrefixHiddenNum,
                 onArrowBackPressed = onResult,
+                actions = {
+                    AddIconButton(onAdd)
+                },
                 onPathChanged = {
                     viewModel.emitIntent(IndexUiIntent.JumpToList(it))
                 }

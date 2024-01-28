@@ -49,4 +49,6 @@ internal class RemoteRootServiceImpl : IRemoteRootService.Stub() {
             return pfd
         }
     }
+
+    override fun mkdirs(src: String): Boolean = PathUtil.mkdirs(src)
 }

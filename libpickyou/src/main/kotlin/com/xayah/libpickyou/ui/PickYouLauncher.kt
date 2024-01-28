@@ -12,7 +12,9 @@ import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.activity.LibPickYouActivity
 import com.xayah.libpickyou.ui.model.PermissionType
 import com.xayah.libpickyou.ui.model.PickerType
+import com.xayah.libpickyou.ui.model.isRoot
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
+import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.registerForActivityResultCompat
 import kotlinx.coroutines.CancellationException
 import java.nio.file.Path
@@ -25,6 +27,7 @@ import kotlin.coroutines.suspendCoroutine
 class PickYouLauncher {
     private lateinit var mLauncher: ActivityResultLauncher<Intent>
     private var mTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+    private var mMkdirsBackend: ((parent: String, child: String) -> Boolean)? = null
     private var mPermissionType: PermissionType = PermissionType.NORMAL
     private val mNextLocalRequestCode = AtomicInteger()
     private var mRootPathList = LibPickYouTokens.DefaultPathList
@@ -35,7 +38,11 @@ class PickYouLauncher {
     private var mPathPrefixHiddenNum = LibPickYouTokens.PathPrefixHiddenNum
 
     companion object {
+        internal val isRootMode: Boolean
+            get() = permissionType.isRoot() && PreferencesUtil.readRequestedRoot()
+
         internal var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        internal var mkdirsBackend: ((parent: String, child: String) -> Boolean)? = null
         internal var permissionType: PermissionType = PermissionType.NORMAL
         internal var rootPathList = LibPickYouTokens.DefaultPathList
         internal var defaultPathList = LibPickYouTokens.DefaultPathList
@@ -77,6 +84,7 @@ class PickYouLauncher {
             }
 
         var sTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        var sMkdirsBackend: ((parent: String, child: String) -> Boolean)? = null
         var sPermissionType: PermissionType = PermissionType.NORMAL
         var sRootPathList = LibPickYouTokens.DefaultPathList
         var sDefaultPathList = LibPickYouTokens.DefaultPathList
@@ -87,6 +95,7 @@ class PickYouLauncher {
 
         fun launch(context: Context, onPathResult: (path: List<String>) -> Unit) {
             traverseBackend = sTraverseBackend
+            mkdirsBackend = sMkdirsBackend
             permissionType = sPermissionType
             pickerType = sPickerType
             limitation = sLimitation
@@ -101,6 +110,7 @@ class PickYouLauncher {
 
         suspend fun awaitPickerOnce(context: Context): List<String> = suspendCoroutine { cont ->
             traverseBackend = sTraverseBackend
+            mkdirsBackend = sMkdirsBackend
             permissionType = sPermissionType
             pickerType = sPickerType
             limitation = sLimitation
@@ -161,12 +171,18 @@ class PickYouLauncher {
     fun setTraverseBackend(backend: (path: Path) -> DirChildrenParcelable) { this.mTraverseBackend = backend }
 
     /**
+     * Set the backend of mkdirs.
+     */
+    fun setMkdirsBackend(backend: (parent: String, child: String) -> Boolean) { this.mMkdirsBackend = backend }
+
+    /**
      * Set the permission type.
      */
     fun setPermissionType(type: PermissionType) { this.mPermissionType = type }
 
     private fun launch(context: Context) {
         traverseBackend = mTraverseBackend
+        mkdirsBackend = mMkdirsBackend
         permissionType = mPermissionType
         pickerType = mPickerType
         limitation = mLimitation

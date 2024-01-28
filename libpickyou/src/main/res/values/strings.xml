@@ -11,4 +11,8 @@
     <string name="necessary_permissions">Necessary permissions</string>
     <string name="storage">Storage</string>
     <string name="failed_to_grant_permission">Failed to grant permission!</string>
+    <string name="created">Created</string>
+    <string name="failed_to_create">Failed to create</string>
+    <string name="create_folder">Create folder</string>
+    <string name="name">Name</string>
 </resources>

@@ -10,4 +10,8 @@
     <string name="necessary_permissions">必要权限</string>
     <string name="storage">存储</string>
     <string name="failed_to_grant_permission">权限获取失败!</string>
+    <string name="created">已创建</string>
+    <string name="failed_to_create">创建失败</string>
+    <string name="create_folder">创建文件夹</string>
+    <string name="name">名称</string>
 </resources>

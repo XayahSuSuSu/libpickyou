@@ -2,6 +2,7 @@ package com.xayah.libpickyou.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -36,4 +37,9 @@ internal fun IconButton(icon: ImageVectorToken, onClick: () -> Unit) {
 @Composable
 internal fun ArrowBackIconButton(onClick: () -> Unit) {
     IconButton(icon = ImageVectorToken.fromVector(Icons.Rounded.ArrowBack), onClick = onClick)
+}
+
+@Composable
+internal fun AddIconButton(onClick: () -> Unit) {
+    IconButton(icon = ImageVectorToken.fromVector(Icons.Rounded.Add), onClick = onClick)
 }

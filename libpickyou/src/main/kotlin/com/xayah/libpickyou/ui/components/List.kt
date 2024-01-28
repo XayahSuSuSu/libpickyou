@@ -36,13 +36,11 @@ import com.xayah.libpickyou.ui.animation.CrossFade
 import com.xayah.libpickyou.ui.model.ImageVectorToken
 import com.xayah.libpickyou.ui.model.PickerType
 import com.xayah.libpickyou.ui.model.fromDrawable
-import com.xayah.libpickyou.ui.model.isRoot
 import com.xayah.libpickyou.ui.model.value
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.ui.tokens.SizeTokens
 import com.xayah.libpickyou.util.DateUtil
 import com.xayah.libpickyou.util.PathUtil
-import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.toPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -89,7 +87,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    LaunchedEffect(uiState.path) {
+    LaunchedEffect(uiState.path, uiState.refreshState) {
         // Loading animation
         progressLatch.value = CountDownLatch(1)
         contentLatch.value = CountDownLatch(1)
@@ -105,7 +103,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                     val children: DirChildrenParcelable
                     val path = Paths.get(uiState.path.toPath())
                     children = PickYouLauncher.traverseBackend?.invoke(path)
-                        ?: if (PickYouLauncher.permissionType.isRoot() && PreferencesUtil.readRequestedRoot()) {
+                        ?: if (PickYouLauncher.isRootMode) {
                             viewModel.remoteRootService.traverse(path)
                         } else {
                             PathUtil.traverse(path)

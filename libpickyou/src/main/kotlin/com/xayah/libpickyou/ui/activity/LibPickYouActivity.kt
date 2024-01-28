@@ -29,6 +29,7 @@ import com.topjohnwu.superuser.Shell
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.ui.PickYouLauncher
 import com.xayah.libpickyou.ui.components.ContentList
+import com.xayah.libpickyou.ui.components.LocalSlotScope
 import com.xayah.libpickyou.ui.components.PermissionScaffold
 import com.xayah.libpickyou.ui.components.PickYouScaffold
 import com.xayah.libpickyou.ui.components.SelectionScaffold
@@ -39,6 +40,7 @@ import com.xayah.libpickyou.ui.model.isRoot
 import com.xayah.libpickyou.ui.model.isStorage
 import com.xayah.libpickyou.ui.theme.LibPickYouTheme
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
+import com.xayah.libpickyou.util.PathUtil
 import com.xayah.libpickyou.util.PermissionUtil
 import com.xayah.libpickyou.util.PermissionUtil.Companion.checkStoragePermissions
 import com.xayah.libpickyou.util.PreferencesUtil
@@ -65,6 +67,7 @@ internal class LibPickYouActivity : ComponentActivity() {
 
         setContent {
             LibPickYouTheme {
+                val dialogState = LocalSlotScope.current!!.dialogSlot
                 val uiState by viewModel.uiState.collectAsState()
                 var permissions by remember { mutableStateOf(true) }
                 val permissionsState = PermissionUtil.getPermissionsState()
@@ -77,6 +80,29 @@ internal class LibPickYouActivity : ComponentActivity() {
                     setResult(Activity.RESULT_OK, intent)
                     viewModel.remoteRootService.destroyService()
                     finish()
+                }
+                val onAdd: () -> Unit = {
+                    viewModel.launchOnIO {
+                        val parent = uiState.pathString
+                        val (_, child) = dialogState.openEdit()
+                        val result = PickYouLauncher.mkdirsBackend?.invoke(parent, child)
+                            ?: if (PickYouLauncher.isRootMode) {
+                                viewModel.remoteRootService.mkdirs("$parent/$child")
+                            } else {
+                                PathUtil.mkdirs("$parent/$child")
+                            }
+                        viewModel.emitIntent(IndexUiIntent.Refresh)
+                        viewModel.emitEffectSuspend(IndexUiEffect.DismissSnackbar)
+                        viewModel.emitEffectSuspend(
+                            IndexUiEffect.ShowSnackbar(
+                                if (result) {
+                                    getString(R.string.created)
+                                } else {
+                                    getString(R.string.failed_to_create)
+                                } + ": $child"
+                            )
+                        )
+                    }
                 }
                 val onPermissionsChanged: () -> Unit = {
                     permissions = checkStoragePermissions(permissionsState, PickYouLauncher.permissionType)
@@ -143,6 +169,7 @@ internal class LibPickYouActivity : ComponentActivity() {
                             navController = navController,
                             viewModel = viewModel,
                             onResult = onResult,
+                            onAdd = onAdd,
                             content = {
                                 ContentList(viewModel = viewModel)
                             }

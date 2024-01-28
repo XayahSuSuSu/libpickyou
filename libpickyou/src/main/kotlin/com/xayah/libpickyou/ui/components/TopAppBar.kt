@@ -8,6 +8,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -158,6 +159,7 @@ internal fun PickYouTopAppBar(
     path: List<String>,
     pathPrefixHiddenNum: Int,
     onArrowBackPressed: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
     onPathChanged: (newPath: List<String>) -> Unit,
 ) {
     // Sets the app bar's height offset to collapse the entire bar's height when content is
@@ -207,13 +209,14 @@ internal fun PickYouTopAppBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ArrowBackIconButton(onArrowBackPressed)
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     TopBarTitle(text = title)
                     TopBarSubTitle(
                         modifier = Modifier.horizontalScroll(rememberScrollState(0)),
                         text = subtitle
                     )
                 }
+                actions()
             }
 
             PathChipGroup(

@@ -146,4 +146,6 @@ internal class RemoteRootService(private val context: Context) {
         parcel.recycle()
         return children
     }
+
+    suspend fun mkdirs(src: String) = getService().mkdirs(src)
 }
