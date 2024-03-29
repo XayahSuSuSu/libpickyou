@@ -41,6 +41,9 @@ import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.ui.tokens.SizeTokens
 import com.xayah.libpickyou.util.DateUtil
 import com.xayah.libpickyou.util.PathUtil
+import com.xayah.libpickyou.util.PathUtil.isSpecialPathAndroid
+import com.xayah.libpickyou.util.PathUtil.isSpecialPathAndroidData
+import com.xayah.libpickyou.util.PathUtil.isSpecialPathAndroidObb
 import com.xayah.libpickyou.util.toPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -106,7 +109,13 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                         ?: if (PickYouLauncher.isRootMode) {
                             viewModel.remoteRootService.traverse(path)
                         } else {
-                            PathUtil.traverse(path)
+                            if (path.isSpecialPathAndroid) {
+                                PathUtil.traverseSpecialPathAndroid(path)
+                            } else if (path.isSpecialPathAndroidData || path.isSpecialPathAndroidObb) {
+                                PathUtil.traverseSpecialPathAndroidDataOrObb(path, context.packageManager)
+                            } else {
+                                PathUtil.traverse(path)
+                            }
                         }
                     viewModel.emitStateSuspend(uiState.copy(exceptionMessage = null))
                     viewModel.emitIntentSuspend(IndexUiIntent.UpdateChildren(children))

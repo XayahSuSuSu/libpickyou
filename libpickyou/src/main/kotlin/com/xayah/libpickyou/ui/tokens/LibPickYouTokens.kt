@@ -5,6 +5,9 @@ internal object LibPickYouTokens {
     const val ParcelTmpFileName = "pick_you_tmp"
 
     val DefaultPathList = listOf("", "storage", "emulated", "0")
+    val SpecialPathAndroid = listOf("", "storage", "emulated", "0", "Android")
+    val SpecialPathAndroidData = listOf("", "storage", "emulated", "0", "Android", "data")
+    val SpecialPathAndroidObb = listOf("", "storage", "emulated", "0", "Android", "obb")
 
     const val SelectedItemsSeparator = ", "
     const val PathSeparator = "/"

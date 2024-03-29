@@ -63,6 +63,9 @@ dependencies {
 
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)
+
+    // fsaf
+    implementation(libs.fsaf)
 }
 
 afterEvaluate {

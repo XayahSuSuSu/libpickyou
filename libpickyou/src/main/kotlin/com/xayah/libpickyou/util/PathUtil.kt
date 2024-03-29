@@ -1,8 +1,13 @@
 package com.xayah.libpickyou.util
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.parcelables.FileParcelable
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.SpecialPathAndroid
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.SpecialPathAndroidData
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.SpecialPathAndroidObb
 import java.io.File
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -104,4 +109,66 @@ internal object PathUtil {
     }
 
     fun mkdirs(src: String) = File(src).mkdirs()
+
+    fun traverseSpecialPathAndroid(path: Path): DirChildrenParcelable {
+        val dirChildrenParcelable = traverse(path)
+        var dataExists = false
+        var obbExists = false
+        val directories = dirChildrenParcelable.directories.toMutableList()
+        directories.forEach {
+            if (it.name == "data") dataExists = true
+            else if (it.name == "obb") obbExists = true
+        }
+        if (dataExists.not()) {
+            val dataFile = File(SpecialPathAndroidData.toPath())
+            if (dataFile.exists()) directories.add(FileParcelable("data", dataFile.lastModified()))
+        }
+        if (obbExists.not()) {
+            val obbFile = File(SpecialPathAndroidObb.toPath())
+            if (obbFile.exists()) directories.add(FileParcelable("obb", obbFile.lastModified()))
+        }
+        dirChildrenParcelable.directories = directories.sortedBy { it.name }.toList()
+        return dirChildrenParcelable
+    }
+
+    /**
+     * Generate children via packages
+     * @see <a href="https://github.com/folderv/androidDataWithoutRootAPI33/blob/6e033ddea44cc3366736fd04e85674ed11c7b8b7/app/src/main/java/com/android/test/AppSelectDialogFragment.kt#L58">androidDataWithoutRootAPI33</a>
+     */
+    fun traverseSpecialPathAndroidDataOrObb(path: Path, pm: PackageManager): DirChildrenParcelable {
+        val directories = mutableListOf<FileParcelable>()
+        val children = hashSetOf<String>()
+        val activities = pm.queryIntentActivities(Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) }, 0)
+        activities.forEach {
+            val packageName = it.activityInfo.packageName
+            if (children.contains(packageName).not()) {
+                val child = File(path.pathString, packageName)
+                if (child.exists()) directories.add(FileParcelable(packageName, child.lastModified()))
+                children.add(packageName)
+            }
+        }
+        val packages = pm.getInstalledApplications(0)
+        packages.forEach {
+            val packageName = it.packageName
+            if (children.contains(packageName).not()) {
+                val child = File(path.pathString, packageName)
+                if (child.exists()) directories.add(FileParcelable(packageName, child.lastModified()))
+                children.add(packageName)
+            }
+        }
+
+        // Sort by alphabet
+        directories.sortBy { it.name }
+
+        return DirChildrenParcelable(files = mutableListOf(), directories = directories)
+    }
+
+    val Path.isSpecialPathAndroid: Boolean
+        get() = this.pathString == SpecialPathAndroid.toPath()
+
+    val Path.isSpecialPathAndroidData: Boolean
+        get() = this.pathString == SpecialPathAndroidData.toPath()
+
+    val Path.isSpecialPathAndroidObb: Boolean
+        get() = this.pathString == SpecialPathAndroidObb.toPath()
 }

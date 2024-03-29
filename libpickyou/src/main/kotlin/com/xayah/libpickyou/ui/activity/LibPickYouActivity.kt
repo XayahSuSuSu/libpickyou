@@ -2,6 +2,7 @@ package com.xayah.libpickyou.ui.activity
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -54,6 +55,7 @@ internal class LibPickYouActivity : ComponentActivity() {
             limitation = PickYouLauncher.limitation,
             title = PickYouLauncher.title,
             pathPrefixHiddenNum = PickYouLauncher.pathPrefixHiddenNum,
+            safOnSpecialPath = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         )
     }
     private var firstResume = true

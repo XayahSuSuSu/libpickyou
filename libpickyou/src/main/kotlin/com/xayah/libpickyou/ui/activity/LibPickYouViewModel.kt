@@ -21,6 +21,7 @@ internal data class IndexUiState(
     val pathPrefixHiddenNum: Int,
     val exceptionMessage: String? = null,
     val refreshState: Boolean,
+    val safOnSpecialPath: Boolean,
 ) : UiState {
     val canUp: Boolean
         get() = isAccessible(path.toMutableList().apply { removeLast() })
@@ -56,6 +57,7 @@ internal class LibPickYouViewModel(
     limitation: Int,
     title: String,
     pathPrefixHiddenNum: Int,
+    safOnSpecialPath: Boolean,
 ) : BaseViewModel<IndexUiState, IndexUiIntent, IndexUiEffect>(
     IndexUiState(
         path = path,
@@ -63,7 +65,8 @@ internal class LibPickYouViewModel(
         limitation = limitation,
         title = title,
         pathPrefixHiddenNum = pathPrefixHiddenNum,
-        refreshState = true
+        refreshState = true,
+        safOnSpecialPath = safOnSpecialPath,
     )
 ) {
     companion object {
@@ -74,6 +77,7 @@ internal class LibPickYouViewModel(
             private val limitation: Int,
             private val title: String,
             private val pathPrefixHiddenNum: Int,
+            private val safOnSpecialPath: Boolean,
         ) : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 return LibPickYouViewModel(
@@ -81,7 +85,8 @@ internal class LibPickYouViewModel(
                     type = type,
                     limitation = limitation,
                     title = title,
-                    pathPrefixHiddenNum = pathPrefixHiddenNum
+                    pathPrefixHiddenNum = pathPrefixHiddenNum,
+                    safOnSpecialPath = safOnSpecialPath,
                 ) as T
             }
         }
