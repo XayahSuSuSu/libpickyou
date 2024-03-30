@@ -61,9 +61,9 @@ internal fun ChildListItem(
                     )
             }
             Column(modifier = Modifier.weight(1f)) {
-                BodyLargeText(title)
+                BodyLargeText(text = title, color = MaterialTheme.colorScheme.onSurface)
                 if (subtitle != null)
-                    BodyMediumText(text = subtitle)
+                    BodyMediumText(text = subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (isChecked != null && onCheckBoxClick != null) {
                 IconToggleButton(
