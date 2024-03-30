@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.documentfile.provider.DocumentFile
 import com.xayah.libpickyou.R
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
@@ -79,18 +80,20 @@ internal fun onCheckBoxClick(
 internal fun ContentList(viewModel: LibPickYouViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
-    BackHandler(uiState.canUp) {
-        viewModel.emitIntent(IndexUiIntent.Exit)
-    }
-
     val progressVisible = remember { mutableStateOf(true) }
     val contentVisible = remember { mutableStateOf(false) }
     val progressLatch = remember { mutableStateOf(CountDownLatch(1)) }
     val contentLatch = remember { mutableStateOf(CountDownLatch(1)) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val documentUriState by viewModel.documentUriState.collectAsState()
+    val exceptionMessageState by viewModel.exceptionMessageState.collectAsState()
 
-    LaunchedEffect(uiState.path, uiState.refreshState) {
+    BackHandler(uiState.canUp) {
+        viewModel.emitIntent(IndexUiIntent.Exit(context = context))
+    }
+
+    LaunchedEffect(uiState.path, uiState.refreshState, documentUriState) {
         // Loading animation
         progressLatch.value = CountDownLatch(1)
         contentLatch.value = CountDownLatch(1)
@@ -109,18 +112,22 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                         ?: if (PickYouLauncher.isRootMode) {
                             viewModel.remoteRootService.traverse(path)
                         } else {
-                            if (path.isSpecialPathAndroid) {
-                                PathUtil.traverseSpecialPathAndroid(path)
-                            } else if (path.isSpecialPathAndroidData || path.isSpecialPathAndroidObb) {
-                                PathUtil.traverseSpecialPathAndroidDataOrObb(path, context.packageManager)
+                            if (documentUriState != null) {
+                                PathUtil.traverse(DocumentFile.fromTreeUri(context, documentUriState!!)!!)
                             } else {
-                                PathUtil.traverse(path)
+                                if (path.isSpecialPathAndroid) {
+                                    PathUtil.traverseSpecialPathAndroid(path)
+                                } else if (path.isSpecialPathAndroidData || path.isSpecialPathAndroidObb) {
+                                    PathUtil.traverseSpecialPathAndroidDataOrObb(path, context.packageManager)
+                                } else {
+                                    PathUtil.traverse(path)
+                                }
                             }
                         }
-                    viewModel.emitStateSuspend(uiState.copy(exceptionMessage = null))
+                    viewModel.emitIntentSuspend(IndexUiIntent.SetExceptionMessage(null))
                     viewModel.emitIntentSuspend(IndexUiIntent.UpdateChildren(children))
                 }.onFailure {
-                    viewModel.emitStateSuspend(uiState.copy(exceptionMessage = it.localizedMessage))
+                    viewModel.emitIntentSuspend(IndexUiIntent.SetExceptionMessage(it.localizedMessage))
                 }
                 progressVisible.value = false
             }
@@ -146,7 +153,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
 
         CrossFade(targetState = contentVisible, latch = contentLatch) { target ->
             if (target) {
-                if (uiState.exceptionMessage != null) {
+                if (exceptionMessageState != null) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -166,7 +173,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                                 contentDescription = null,
                                 modifier = Modifier.size(SizeTokens.Level8)
                             )
-                            LabelSmallText(text = uiState.exceptionMessage!!, textAlign = TextAlign.Center)
+                            LabelSmallText(text = exceptionMessageState!!, textAlign = TextAlign.Center)
                         }
                     }
                 } else {
@@ -174,7 +181,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                         if (uiState.canUp)
                             item {
                                 ChildReturnListItem {
-                                    viewModel.emitIntent(IndexUiIntent.Exit)
+                                    viewModel.emitIntent(IndexUiIntent.Exit(context = context))
                                 }
                             }
                         items(items = uiState.children.directories, key = { it.name }) {
@@ -201,9 +208,9 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                                 },
                                 onItemClick = {
                                     if (it.link.isNullOrEmpty().not())
-                                        viewModel.emitIntent(IndexUiIntent.JumpTo(it.link!!))
+                                        viewModel.emitIntent(IndexUiIntent.JumpTo(context, it.link!!))
                                     else
-                                        viewModel.emitIntent(IndexUiIntent.Enter(it.name))
+                                        viewModel.emitIntent(IndexUiIntent.Enter(context, it.name))
                                 }
                             )
                         }

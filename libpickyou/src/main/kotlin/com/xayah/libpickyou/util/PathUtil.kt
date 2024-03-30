@@ -2,6 +2,7 @@ package com.xayah.libpickyou.util
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.documentfile.provider.DocumentFile
 import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.parcelables.FileParcelable
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
@@ -108,6 +109,27 @@ internal object PathUtil {
         return DirChildrenParcelable(files = files, directories = directories)
     }
 
+    fun traverse(path: DocumentFile): DirChildrenParcelable {
+        val files = mutableListOf<FileParcelable>()
+        val directories = mutableListOf<FileParcelable>()
+        val children = path.listFiles()
+        children.forEach {
+            runCatching {
+                if (it.isDirectory) {
+                    directories.add(FileParcelable(it.name!!, it.lastModified()))
+                } else {
+                    files.add(FileParcelable(it.name!!, it.lastModified()))
+                }
+            }
+        }
+
+        // Sort by alphabet
+        files.sortBy { it.name }
+        directories.sortBy { it.name }
+
+        return DirChildrenParcelable(files = files, directories = directories)
+    }
+
     fun mkdirs(src: String) = File(src).mkdirs()
 
     fun traverseSpecialPathAndroid(path: Path): DirChildrenParcelable {
@@ -164,11 +186,23 @@ internal object PathUtil {
     }
 
     val Path.isSpecialPathAndroid: Boolean
-        get() = this.pathString == SpecialPathAndroid.toPath()
+        get() = isSpecialPathAndroid(this.pathString)
 
     val Path.isSpecialPathAndroidData: Boolean
-        get() = this.pathString == SpecialPathAndroidData.toPath()
+        get() = isSpecialPathAndroidData(this.pathString)
 
     val Path.isSpecialPathAndroidObb: Boolean
-        get() = this.pathString == SpecialPathAndroidObb.toPath()
+        get() = isSpecialPathAndroidObb(this.pathString)
+
+    fun isSpecialPathAndroid(path: String) = path == SpecialPathAndroid.toPath()
+    fun isSpecialPathAndroidData(path: String) = path == SpecialPathAndroidData.toPath()
+    fun isSpecialPathAndroidObb(path: String) = path == SpecialPathAndroidObb.toPath()
+
+    fun underSpecialPathAndroidData(path: List<String>) = path.toPath().let {
+        isSpecialPathAndroidData(it).not() && it.contains(SpecialPathAndroidData.toPath())
+    }
+
+    fun underSpecialPathAndroidObb(path: List<String>) = path.toPath().let {
+        isSpecialPathAndroidObb(it).not() && it.contains(SpecialPathAndroidObb.toPath())
+    }
 }

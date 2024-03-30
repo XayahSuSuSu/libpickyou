@@ -8,6 +8,11 @@ internal object LibPickYouTokens {
     val SpecialPathAndroid = listOf("", "storage", "emulated", "0", "Android")
     val SpecialPathAndroidData = listOf("", "storage", "emulated", "0", "Android", "data")
     val SpecialPathAndroidObb = listOf("", "storage", "emulated", "0", "Android", "obb")
+    const val DocumentAuthority = "com.android.externalstorage.documents"
+    const val ProviderShowAdvanced = "android.provider.extra.SHOW_ADVANCED"
+    const val ContentShowAdvanced = "android.content.extra.SHOW_ADVANCED"
+    const val DocumentUriAndroidData = "primary:Android/data"
+    const val DocumentUriAndroidObb = "primary:Android/obb"
 
     const val SelectedItemsSeparator = ", "
     const val PathSeparator = "/"

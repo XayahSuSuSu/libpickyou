@@ -83,7 +83,7 @@ internal fun PickYouScaffold(
                     AddIconButton(onAdd)
                 },
                 onPathChanged = {
-                    viewModel.emitIntent(IndexUiIntent.JumpToList(it))
+                    viewModel.emitIntent(IndexUiIntent.JumpToList(context, it))
                 }
             )
         },

@@ -66,6 +66,9 @@ dependencies {
 
     // fsaf
     implementation(libs.fsaf)
+
+    // document
+    implementation(libs.androidx.documentfile)
 }
 
 afterEvaluate {

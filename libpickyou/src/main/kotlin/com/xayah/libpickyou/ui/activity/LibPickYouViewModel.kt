@@ -1,5 +1,14 @@
 package com.xayah.libpickyou.ui.activity
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.Intent.ACTION_OPEN_DOCUMENT_TREE
+import android.net.Uri
+import android.provider.DocumentsContract
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -8,8 +17,20 @@ import com.xayah.libpickyou.parcelables.DirChildrenParcelable
 import com.xayah.libpickyou.ui.PickYouLauncher
 import com.xayah.libpickyou.ui.model.PickerType
 import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.ContentShowAdvanced
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.DocumentAuthority
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.DocumentUriAndroidData
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.DocumentUriAndroidObb
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.ProviderShowAdvanced
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.SpecialPathAndroidData
+import com.xayah.libpickyou.ui.tokens.LibPickYouTokens.SpecialPathAndroidObb
+import com.xayah.libpickyou.util.PathUtil
 import com.xayah.libpickyou.util.RemoteRootService
+import com.xayah.libpickyou.util.registerForActivityResultCompat
 import com.xayah.libpickyou.util.toPath
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import java.util.concurrent.atomic.AtomicInteger
 
 internal data class IndexUiState(
     val path: List<String>,
@@ -19,7 +40,6 @@ internal data class IndexUiState(
     val limitation: Int,
     val title: String,
     val pathPrefixHiddenNum: Int,
-    val exceptionMessage: String? = null,
     val refreshState: Boolean,
     val safOnSpecialPath: Boolean,
 ) : UiState {
@@ -40,15 +60,17 @@ internal data class IndexUiState(
 }
 
 internal sealed class IndexUiIntent : UiIntent {
-    data class Enter(val item: String) : IndexUiIntent()
-    object Exit : IndexUiIntent()
-    data class JumpToList(val target: List<String>) : IndexUiIntent()
-    data class JumpTo(val target: String) : IndexUiIntent()
+    data class Enter(val context: Context, val item: String) : IndexUiIntent()
+    data class Exit(val context: Context) : IndexUiIntent()
+    data class JumpToList(val context: Context, val target: List<String>) : IndexUiIntent()
+    data class JumpTo(val context: Context, val target: String) : IndexUiIntent()
     data class UpdateChildren(val children: DirChildrenParcelable) : IndexUiIntent()
     data class JoinSelection(val name: String) : IndexUiIntent()
     data class RemoveSelection(val name: String) : IndexUiIntent()
     object Refresh : IndexUiIntent()
 
+    data class RequestSpecialDir(val context: Context, val specialPath: String, val documentUri: String, val name: String) : IndexUiIntent()
+    data class SetExceptionMessage(val msg: String?) : IndexUiIntent()
 }
 
 internal class LibPickYouViewModel(
@@ -94,13 +116,21 @@ internal class LibPickYouViewModel(
 
     lateinit var remoteRootService: RemoteRootService
 
+    private var _documentUriState: MutableStateFlow<Uri?> = MutableStateFlow(null)
+    val documentUriState: StateFlow<Uri?> = _documentUriState.stateInScope(null)
+
+    private var _exceptionMessageState: MutableStateFlow<String?> = MutableStateFlow(null)
+    val exceptionMessageState: StateFlow<String?> = _exceptionMessageState.stateInScope(null)
+
     override suspend fun onEvent(state: IndexUiState, intent: IndexUiIntent) {
         when (intent) {
             is IndexUiIntent.Enter -> {
                 if (intent.item.isEmpty()) return
                 val path = state.path.toMutableList()
                 path.add(intent.item)
-                emitState(state.copy(path = path.toList()))
+                emitStateSuspend(state.copy(path = path.toList()))
+
+                checkSpecialPath(intent.context, path)
             }
 
             is IndexUiIntent.Exit -> {
@@ -110,6 +140,8 @@ internal class LibPickYouViewModel(
                 onAccessible(path) {
                     emitState(state.copy(path = path.toList()))
                 }
+
+                checkSpecialPath(intent.context, path)
             }
 
             is IndexUiIntent.JumpToList -> {
@@ -117,10 +149,12 @@ internal class LibPickYouViewModel(
                 onAccessible(intent.target) {
                     emitState(state.copy(path = intent.target))
                 }
+
+                checkSpecialPath(intent.context, intent.target)
             }
 
             is IndexUiIntent.JumpTo -> {
-                emitIntent(IndexUiIntent.JumpToList(intent.target.split(LibPickYouTokens.PathSeparator)))
+                emitIntent(IndexUiIntent.JumpToList(intent.context, intent.target.split(LibPickYouTokens.PathSeparator)))
             }
 
             is IndexUiIntent.UpdateChildren -> {
@@ -145,6 +179,62 @@ internal class LibPickYouViewModel(
             is IndexUiIntent.Refresh -> {
                 emitState(state.copy(refreshState = state.refreshState.not()))
             }
+
+            is IndexUiIntent.RequestSpecialDir -> {
+                val context = intent.context
+                val name = intent.name.replace("${intent.specialPath}/", "")
+                val documentUri = DocumentsContract.buildDocumentUri(DocumentAuthority, "${intent.documentUri}/$name")
+                val treeUri = DocumentsContract.buildTreeDocumentUri(DocumentAuthority, "${intent.documentUri}/$name")
+                val documentFile = DocumentFile.fromTreeUri(context, treeUri)
+                val canRead = documentFile?.canRead() ?: false
+                val canWrite = documentFile?.canWrite() ?: false
+                if (canRead && canWrite) {
+                    _documentUriState.value = treeUri
+                } else {
+                    withMainContext {
+                        context.registerForActivityResultCompat(
+                            AtomicInteger(),
+                            ActivityResultContracts.StartActivityForResult()
+                        ) { result: ActivityResult ->
+                            if (result.resultCode == Activity.RESULT_OK) {
+                                if (result.data?.data != null) {
+                                    _documentUriState.value = treeUri
+                                    val data = result.data?.data!!
+                                    val flags = result.data?.flags!!
+                                    context.contentResolver.takePersistableUriPermission(data, flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION))
+
+                                    _exceptionMessageState.value = "Mismatch: $data and $treeUri"
+                                }
+                            }
+                        }.launch(
+                            Intent(ACTION_OPEN_DOCUMENT_TREE)
+                                .addFlags(
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                            or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                                            or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+                                )
+                                .putExtra(ProviderShowAdvanced, true)
+                                .putExtra(ContentShowAdvanced, true)
+                                .putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentUri)
+                        )
+                    }
+                }
+            }
+
+            is IndexUiIntent.SetExceptionMessage -> {
+                _exceptionMessageState.value = intent.msg
+            }
+        }
+    }
+
+    private suspend fun checkSpecialPath(context: Context, path: List<String>) {
+        if (PathUtil.underSpecialPathAndroidData(path)) {
+            emitIntentSuspend(IndexUiIntent.RequestSpecialDir(context, SpecialPathAndroidData.toPath(), DocumentUriAndroidData, path.toPath()))
+        } else if (PathUtil.underSpecialPathAndroidObb(path)) {
+            emitIntentSuspend(IndexUiIntent.RequestSpecialDir(context, SpecialPathAndroidObb.toPath(), DocumentUriAndroidObb, path.toPath()))
+        } else {
+            _documentUriState.value = null
         }
     }
 
