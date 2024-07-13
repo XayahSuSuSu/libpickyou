@@ -16,9 +16,11 @@
 
 package com.xayah.libpickyou.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 
 object ContextUtil {
+    @SuppressLint("PrivateApi")
     fun getContext(): Context? {
         var ctx: Context? = null
         // Fetching ActivityThread on the main thread is no longer required on API 18+

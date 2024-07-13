@@ -39,7 +39,7 @@ internal sealed class IndexUiEffect : UiEffect {
         val duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite,
     ) : IndexUiEffect()
 
-    object DismissSnackbar : IndexUiEffect()
+    data object DismissSnackbar : IndexUiEffect()
 }
 
 internal abstract class BaseViewModel<S : UiState, I : UiIntent, E : IndexUiEffect>(state: S) : IBaseViewModel<S, I, IndexUiEffect>, ViewModel() {

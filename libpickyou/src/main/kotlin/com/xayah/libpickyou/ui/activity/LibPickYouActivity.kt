@@ -1,6 +1,5 @@
 package com.xayah.libpickyou.ui.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -79,7 +78,7 @@ internal class LibPickYouActivity : ComponentActivity() {
                 val onResult = {
                     val intent = Intent()
                     intent.putStringArrayListExtra(LibPickYouTokens.IntentExtraPath, ArrayList(viewModel.uiState.value.selection))
-                    setResult(Activity.RESULT_OK, intent)
+                    setResult(RESULT_OK, intent)
                     viewModel.remoteRootService.destroyService()
                     finish()
                 }

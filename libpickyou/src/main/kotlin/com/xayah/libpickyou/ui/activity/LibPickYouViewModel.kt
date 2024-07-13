@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_OPEN_DOCUMENT_TREE
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -67,7 +68,7 @@ internal sealed class IndexUiIntent : UiIntent {
     data class UpdateChildren(val children: DirChildrenParcelable) : IndexUiIntent()
     data class JoinSelection(val name: String) : IndexUiIntent()
     data class RemoveSelection(val name: String) : IndexUiIntent()
-    object Refresh : IndexUiIntent()
+    data object Refresh : IndexUiIntent()
 
     data class RequestSpecialDir(val context: Context, val specialPath: String, val documentUri: String, val name: String) : IndexUiIntent()
     data class SetExceptionMessage(val msg: String?) : IndexUiIntent()
@@ -192,6 +193,18 @@ internal class LibPickYouViewModel(
                     _documentUriState.value = treeUri
                 } else {
                     withMainContext {
+                        val newIntent = Intent(ACTION_OPEN_DOCUMENT_TREE)
+                            .addFlags(
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                        or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                        or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                                        or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+                            )
+                            .putExtra(ProviderShowAdvanced, true)
+                            .putExtra(ContentShowAdvanced, true)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            newIntent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentUri)
+                        }
                         context.registerForActivityResultCompat(
                             AtomicInteger(),
                             ActivityResultContracts.StartActivityForResult()
@@ -206,18 +219,7 @@ internal class LibPickYouViewModel(
                                     _exceptionMessageState.value = "Mismatch: $data and $treeUri"
                                 }
                             }
-                        }.launch(
-                            Intent(ACTION_OPEN_DOCUMENT_TREE)
-                                .addFlags(
-                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                            or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                                            or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
-                                )
-                                .putExtra(ProviderShowAdvanced, true)
-                                .putExtra(ContentShowAdvanced, true)
-                                .putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentUri)
-                        )
+                        }.launch(newIntent)
                     }
                 }
             }

@@ -13,10 +13,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
@@ -161,7 +161,7 @@ internal fun CommonScaffold(
                 SnackbarHost(modifier = Modifier.align(Alignment.BottomCenter), hostState = snackbarHostState)
             }
 
-            Divider(color = MaterialTheme.colorScheme.primary)
+            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
