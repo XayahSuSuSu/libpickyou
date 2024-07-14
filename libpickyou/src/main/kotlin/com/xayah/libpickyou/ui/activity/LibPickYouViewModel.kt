@@ -231,12 +231,28 @@ internal class LibPickYouViewModel(
     }
 
     private suspend fun checkSpecialPath(context: Context, path: List<String>) {
-        if (PathUtil.underSpecialPathAndroidData(path)) {
-            emitIntentSuspend(IndexUiIntent.RequestSpecialDir(context, SpecialPathAndroidData.toPath(), DocumentUriAndroidData, path.toPath()))
-        } else if (PathUtil.underSpecialPathAndroidObb(path)) {
-            emitIntentSuspend(IndexUiIntent.RequestSpecialDir(context, SpecialPathAndroidObb.toPath(), DocumentUriAndroidObb, path.toPath()))
-        } else {
-            _documentUriState.value = null
+        if (PickYouLauncher.isRootMode.not() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (PathUtil.underSpecialPathAndroidData(path)) {
+                emitIntentSuspend(
+                    IndexUiIntent.RequestSpecialDir(
+                        context,
+                        SpecialPathAndroidData.toPath(),
+                        DocumentUriAndroidData,
+                        path.toPath()
+                    )
+                )
+            } else if (PathUtil.underSpecialPathAndroidObb(path)) {
+                emitIntentSuspend(
+                    IndexUiIntent.RequestSpecialDir(
+                        context,
+                        SpecialPathAndroidObb.toPath(),
+                        DocumentUriAndroidObb,
+                        path.toPath()
+                    )
+                )
+            } else {
+                _documentUriState.value = null
+            }
         }
     }
 
