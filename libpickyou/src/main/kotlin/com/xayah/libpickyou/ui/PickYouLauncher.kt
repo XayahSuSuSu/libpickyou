@@ -17,7 +17,6 @@ import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.registerForActivityResultCompat
 import kotlinx.coroutines.CancellationException
-import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -26,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class PickYouLauncher {
     private lateinit var mLauncher: ActivityResultLauncher<Intent>
-    private var mTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+    private var mTraverseBackend: ((pathString: String) -> DirChildrenParcelable)? = null
     private var mMkdirsBackend: ((parent: String, child: String) -> Boolean)? = null
     private var mPermissionType: PermissionType = PermissionType.NORMAL
     private val mNextLocalRequestCode = AtomicInteger()
@@ -41,7 +40,7 @@ class PickYouLauncher {
         internal val isRootMode: Boolean
             get() = permissionType.isRoot() && PreferencesUtil.readRequestedRoot()
 
-        internal var traverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        internal var traverseBackend: ((pathString: String) -> DirChildrenParcelable)? = null
         internal var mkdirsBackend: ((parent: String, child: String) -> Boolean)? = null
         internal var permissionType: PermissionType = PermissionType.NORMAL
         internal var rootPathList = LibPickYouTokens.DefaultPathList
@@ -83,7 +82,7 @@ class PickYouLauncher {
                 }
             }
 
-        var sTraverseBackend: ((path: Path) -> DirChildrenParcelable)? = null
+        var sTraverseBackend: ((pathString: String) -> DirChildrenParcelable)? = null
         var sMkdirsBackend: ((parent: String, child: String) -> Boolean)? = null
         var sPermissionType: PermissionType = PermissionType.NORMAL
         var sRootPathList = LibPickYouTokens.DefaultPathList
@@ -168,7 +167,9 @@ class PickYouLauncher {
     /**
      * Set the backend of traverse.
      */
-    fun setTraverseBackend(backend: (path: Path) -> DirChildrenParcelable) { this.mTraverseBackend = backend }
+    fun setTraverseBackend(backend: (pathString: String) -> DirChildrenParcelable) {
+        this.mTraverseBackend = backend
+    }
 
     /**
      * Set the backend of mkdirs.

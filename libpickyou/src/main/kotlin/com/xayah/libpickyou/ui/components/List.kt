@@ -49,7 +49,6 @@ import com.xayah.libpickyou.util.toPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.nio.file.Paths
 import java.util.concurrent.CountDownLatch
 
 internal fun onCheckBoxClick(
@@ -107,7 +106,7 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
 
                 runCatching {
                     val children: DirChildrenParcelable
-                    val path = Paths.get(uiState.path.toPath())
+                    val path = uiState.path.toPath()
                     children = PickYouLauncher.traverseBackend?.invoke(path)
                         ?: if (PickYouLauncher.isRootMode) {
                             viewModel.remoteRootService.traverse(path)
@@ -115,9 +114,12 @@ internal fun ContentList(viewModel: LibPickYouViewModel) {
                             if (documentUriState != null) {
                                 PathUtil.traverse(DocumentFile.fromTreeUri(context, documentUriState!!)!!)
                             } else {
-                                if (path.isSpecialPathAndroid) {
+                                if (isSpecialPathAndroid(path)) {
                                     PathUtil.traverseSpecialPathAndroid(path)
-                                } else if (path.isSpecialPathAndroidData || path.isSpecialPathAndroidObb) {
+                                } else if (isSpecialPathAndroidData(path) || isSpecialPathAndroidObb(
+                                        path
+                                    )
+                                ) {
                                     PathUtil.traverseSpecialPathAndroidDataOrObb(path, context.packageManager)
                                 } else {
                                     PathUtil.traverse(path)

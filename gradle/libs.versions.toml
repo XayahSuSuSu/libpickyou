@@ -1,7 +1,7 @@
 [versions]
 # config
 compileSdk = "34"
-minSdk = "26"
+minSdk = "24"
 targetSdk = "34"
 versionCode = "6"
 versionName = "2.1.6"

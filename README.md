@@ -3,7 +3,7 @@
 </div>
 
 # PickYou
-[![JitPack](https://jitpack.io/v/xayahsususu/libpickyou.svg)](https://jitpack.io/#xayahsususu/libpickyou)  ![minSdk](https://img.shields.io/badge/minSdk-26-green) [![License](https://img.shields.io/github/license/XayahSuSuSu/AndroidModule-PickYou?color=ff69b4)](./LICENSE)
+[![JitPack](https://jitpack.io/v/xayahsususu/libpickyou.svg)](https://jitpack.io/#xayahsususu/libpickyou)  ![minSdk](https://img.shields.io/badge/minSdk-24-green) [![License](https://img.shields.io/github/license/XayahSuSuSu/AndroidModule-PickYou?color=ff69b4)](./LICENSE)
 
 Android file picker module with the style of Material You.
 

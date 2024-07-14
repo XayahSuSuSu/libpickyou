@@ -16,11 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import java.nio.file.Path
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.io.path.pathString
 
 internal class RemoteRootService(private val context: Context) {
     private var mService: IRemoteRootService? = null
@@ -135,8 +133,8 @@ internal class RemoteRootService(private val context: Context) {
         }
     }
 
-    suspend fun traverse(path: Path): DirChildrenParcelable {
-        val pfd = getService().traverse(path.pathString)
+    suspend fun traverse(pathString: String): DirChildrenParcelable {
+        val pfd = getService().traverse(pathString)
         val stream = ParcelFileDescriptor.AutoCloseInputStream(pfd)
         val bytes = stream.readBytes()
         val parcel = Parcel.obtain()
