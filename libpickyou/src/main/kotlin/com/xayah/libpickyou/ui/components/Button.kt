@@ -11,38 +11,35 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.xayah.libpickyou.ui.model.ImageVectorToken
-import com.xayah.libpickyou.ui.model.StringResourceToken
-import com.xayah.libpickyou.ui.model.fromVector
-import com.xayah.libpickyou.ui.model.value
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.xayah.libpickyou.ui.tokens.IconButtonTokens
 
 @Composable
-internal fun Button(text: StringResourceToken, onClick: () -> Unit) {
-    Button(onClick = onClick, content = { Text(text = text.value) })
+internal fun Button(text: String, onClick: () -> Unit) {
+    Button(onClick = onClick, content = { Text(text = text) })
 }
 
 @Composable
-internal fun TextButton(text: StringResourceToken, onClick: () -> Unit) {
-    TextButton(onClick = onClick, content = { Text(text = text.value) })
+internal fun TextButton(text: String, onClick: () -> Unit) {
+    TextButton(onClick = onClick, content = { Text(text = text) })
 }
 
 @Composable
-internal fun IconButton(icon: ImageVectorToken, onClick: () -> Unit) {
+internal fun IconButton(icon: ImageVector, onClick: () -> Unit) {
     IconButton(modifier = Modifier.size(IconButtonTokens.StateLayerSize), onClick = onClick) {
-        Icon(imageVector = icon.value, contentDescription = null)
+        Icon(imageVector = icon, contentDescription = null)
     }
 }
 
 @Composable
 internal fun ArrowBackIconButton(onClick: () -> Unit) {
     IconButton(
-        icon = ImageVectorToken.fromVector(Icons.AutoMirrored.Rounded.ArrowBack),
+        icon = Icons.AutoMirrored.Rounded.ArrowBack,
         onClick = onClick
     )
 }
 
 @Composable
 internal fun AddIconButton(onClick: () -> Unit) {
-    IconButton(icon = ImageVectorToken.fromVector(Icons.Rounded.Add), onClick = onClick)
+    IconButton(icon = Icons.Rounded.Add, onClick = onClick)
 }

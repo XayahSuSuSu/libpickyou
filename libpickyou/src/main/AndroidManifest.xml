@@ -13,7 +13,7 @@
         android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="true">
         <activity
-            android:name=".ui.activity.LibPickYouActivity"
+            android:name=".ui.LibPickYouActivity"
             android:exported="false" />
     </application>
 </manifest>

@@ -36,7 +36,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.xayah.libpickyou.ui.PickYouLauncher
+import com.xayah.libpickyou.PickYouLauncher
 import com.xayah.libpickyou.ui.model.PermissionType
 import com.xayah.libpickyou.ui.model.PickerType
 import com.xayah.pickyou.ui.theme.PickYouTheme
@@ -44,33 +44,32 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val launcher = PickYouLauncher()
+    private lateinit var launcher: PickYouLauncher
 
     private fun SnackbarHostState.launch(
         path: String,
         type: PickerType,
-        number: String,
         title: String,
         pathPrefixHiddenNum: String,
         permissionType: PermissionType,
         scope: CoroutineScope,
     ) {
-        val num = number.toIntOrNull()
         val hiddenNum = pathPrefixHiddenNum.toIntOrNull()
-        if (num == null || hiddenNum == null) {
+        if (hiddenNum == null) {
             scope.launch {
                 showSnackbar("Please type number")
             }
         } else {
-            launcher.setDefaultPath(path)
-            launcher.setType(type)
-            launcher.setLimitation(num)
-            launcher.setTitle(title)
-            launcher.setPathPrefixHiddenNum(hiddenNum)
-            launcher.setPermissionType(permissionType)
-            launcher.launch(this@MainActivity) { path ->
+            launcher = PickYouLauncher(
+                title = title,
+                pickerType = type,
+                permissionType = permissionType,
+                pathPrefixHiddenNum = hiddenNum,
+                defaultPathList = path.split("/"),
+            )
+            launcher.launch(this@MainActivity) { p ->
                 scope.launch {
-                    showSnackbar(path.toString())
+                    showSnackbar(p)
                 }
             }
         }
@@ -79,24 +78,23 @@ class MainActivity : ComponentActivity() {
     private suspend fun SnackbarHostState.launchSuspended(
         path: String,
         type: PickerType,
-        number: String,
         title: String,
         pathPrefixHiddenNum: String,
         permissionType: PermissionType,
     ) {
-        val num = number.toIntOrNull()
         val hiddenNum = pathPrefixHiddenNum.toIntOrNull()
-        if (num == null || hiddenNum == null) {
+        if (hiddenNum == null) {
             showSnackbar("Please type number")
         } else {
-            launcher.setDefaultPath(path)
-            launcher.setType(type)
-            launcher.setLimitation(num)
-            launcher.setTitle(title)
-            launcher.setPathPrefixHiddenNum(hiddenNum)
-            launcher.setPermissionType(permissionType)
-            val path = launcher.awaitPickerOnce(this@MainActivity)
-            showSnackbar(path.toString())
+            launcher = PickYouLauncher(
+                title = title,
+                pickerType = type,
+                permissionType = permissionType,
+                pathPrefixHiddenNum = hiddenNum,
+                defaultPathList = path.split("/"),
+            )
+            val result = launcher.awaitLaunch(this@MainActivity)
+            showSnackbar(result)
         }
     }
 
@@ -147,14 +145,6 @@ class MainActivity : ComponentActivity() {
                             label = { Text("Default path") },
                         )
 
-                        var number by remember { mutableStateOf("0") }
-                        OutlinedTextField(
-                            value = number,
-                            onValueChange = { number = it },
-                            label = { Text("Number(0: No limitation)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-
                         var pathPrefixHiddenNum by remember { mutableStateOf("0") }
                         OutlinedTextField(
                             value = pathPrefixHiddenNum,
@@ -198,26 +188,20 @@ class MainActivity : ComponentActivity() {
 
                         Button(
                             onClick = {
-                                snackbarHostState.launch(defaultPath, PickerType.FILE, number, title, pathPrefixHiddenNum, permissionType, coroutineScope)
+                                snackbarHostState.launch(defaultPath, PickerType.FILE, title, pathPrefixHiddenNum, permissionType, coroutineScope)
                             }, content = { Text(text = "Pick file") }
                         )
                         Button(
                             onClick = {
-                                snackbarHostState.launch(defaultPath, PickerType.DIRECTORY, number, title, pathPrefixHiddenNum, permissionType, coroutineScope)
+                                snackbarHostState.launch(defaultPath, PickerType.DIRECTORY, title, pathPrefixHiddenNum, permissionType, coroutineScope)
                             },
                             content = { Text(text = "Pick directory") }
                         )
                         Button(
                             onClick = {
-                                snackbarHostState.launch(defaultPath, PickerType.BOTH, number, title, pathPrefixHiddenNum, permissionType, coroutineScope)
-                            },
-                            content = { Text(text = "Pick file or directory") }
-                        )
-                        Button(
-                            onClick = {
                                 coroutineScope.launch {
                                     runCatching {
-                                        snackbarHostState.launchSuspended(defaultPath, PickerType.BOTH, number, title, pathPrefixHiddenNum, permissionType)
+                                        snackbarHostState.launchSuspended(defaultPath, PickerType.FILE, title, pathPrefixHiddenNum, permissionType)
                                     }.onFailure {
                                         snackbarHostState.showSnackbar(it.message.orEmpty())
                                     }

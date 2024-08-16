@@ -19,7 +19,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import kotlin.io.path.isDirectory
 import kotlin.io.path.pathString
 
 internal fun List<String>.subPath(index: Int): List<String> {
@@ -28,7 +27,7 @@ internal fun List<String>.subPath(index: Int): List<String> {
 
 internal fun List<String>.toPath(index: Int? = null): String {
     val path = if (index != null) subPath(index) else this
-    return path.joinToString(separator = LibPickYouTokens.PathSeparator)
+    return path.joinToString(separator = LibPickYouTokens.PATH_SEPARATOR)
 }
 
 internal inline fun tryOn(onTry: () -> Unit) {
@@ -39,6 +38,35 @@ internal inline fun tryOn(onTry: () -> Unit) {
 }
 
 internal object PathUtil {
+    private fun getSymbolicLinkApi24(path: String): String? {
+        val file = File(path)
+        return if (file.canonicalFile.equals(file.absoluteFile).not()) file.canonicalPath else null
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private fun getSymbolicLinkApi26(path: String): String? {
+        val file = Paths.get(path)
+        return if (Files.isSymbolicLink(file)) Files.readSymbolicLink(file).pathString else null
+    }
+
+    fun getSymbolicLink(path: String): String? {
+        var pathSymbolicLink = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getSymbolicLinkApi26(path)
+        } else {
+            getSymbolicLinkApi24(path)
+        }
+        var symbolicLink = pathSymbolicLink
+        while (symbolicLink != null) {
+            symbolicLink = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getSymbolicLinkApi26(symbolicLink)
+            } else {
+                getSymbolicLinkApi24(symbolicLink)
+            }
+            if (symbolicLink != null) pathSymbolicLink = symbolicLink
+        }
+        return pathSymbolicLink
+    }
+
     private fun traverseApi24(
         pathString: String,
         files: MutableList<FileParcelable>,
@@ -46,11 +74,18 @@ internal object PathUtil {
     ) {
         val file = File(pathString)
         file.listFiles()?.forEach {
-            val fileParcelable = FileParcelable(it.name, it.lastModified())
-            if (it.isFile) {
-                files.add(fileParcelable)
+            val fileParcelable = FileParcelable(path = it.name, creationTime = it.lastModified(), link = getSymbolicLink(it.path))
+            if (fileParcelable.link != null) {
+                val s = File(fileParcelable.link!!)
+                if (s.isFile) {
+                    files.add(fileParcelable)
+                } else if (s.isDirectory) {
+                    directories.add(fileParcelable)
+                }
             } else if (file.isDirectory) {
                 directories.add(fileParcelable)
+            } else if (it.isFile) {
+                files.add(fileParcelable)
             }
         }
     }
@@ -73,18 +108,16 @@ internal object PathUtil {
                         val attr = Files.readAttributes(file, BasicFileAttributes::class.java)
                         creationTime = attr.creationTime().toMillis()
                     }
-                    val fileParcelable = FileParcelable(file.fileName.pathString, creationTime)
-                    tryOn {
-                        if (Files.isSymbolicLink(file)) {
-                            val link = Files.readSymbolicLink(file)
-                            fileParcelable.link = link.pathString
-                            if (link.isDirectory()) {
-                                directories.add(fileParcelable)
-                                return FileVisitResult.CONTINUE
-                            }
+                    val fileParcelable = FileParcelable(path = file.fileName.pathString, creationTime = creationTime, link = getSymbolicLink(file.pathString))
+                    if (fileParcelable.link != null) {
+                        if (Files.isDirectory(Paths.get(fileParcelable.link))) {
+                            directories.add(fileParcelable)
+                        } else {
+                            files.add(fileParcelable)
                         }
+                    } else {
+                        files.add(fileParcelable)
                     }
-                    files.add(fileParcelable)
                 }
                 return FileVisitResult.CONTINUE
             }
@@ -102,8 +135,16 @@ internal object PathUtil {
                             val attr = Files.readAttributes(dir, BasicFileAttributes::class.java)
                             creationTime = attr.creationTime().toMillis()
                         }
-                        val fileParcelable = FileParcelable(dir.fileName.pathString, creationTime)
-                        directories.add(fileParcelable)
+                        val fileParcelable = FileParcelable(path = dir.fileName.pathString, creationTime = creationTime, link = getSymbolicLink(dir.pathString))
+                        if (fileParcelable.link != null) {
+                            if (Files.isDirectory(Paths.get(fileParcelable.link))) {
+                                directories.add(fileParcelable)
+                            } else {
+                                files.add(fileParcelable)
+                            }
+                        } else {
+                            directories.add(fileParcelable)
+                        }
                         FileVisitResult.SKIP_SUBTREE
                     }
                 } else {

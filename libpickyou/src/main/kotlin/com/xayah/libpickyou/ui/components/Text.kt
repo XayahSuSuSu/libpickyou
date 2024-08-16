@@ -10,6 +10,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
+fun TitleLargeText(
+    modifier: Modifier = Modifier,
+    text: String,
+    color: Color = Color.Unspecified,
+    textAlign: TextAlign? = null,
+    fontWeight: FontWeight? = null,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    maxLines: Int = Int.MAX_VALUE,
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.titleLarge,
+        color = color,
+        textAlign = textAlign,
+        fontWeight = fontWeight,
+        overflow = overflow,
+        maxLines = maxLines,
+    )
+}
+
+@Composable
 internal fun TopBarTitle(text: String) {
     Text(
         text = text,
@@ -51,10 +73,11 @@ internal fun BodyMediumText(modifier: Modifier = Modifier, text: String, fontWei
 }
 
 @Composable
-internal fun LabelSmallText(modifier: Modifier = Modifier, text: String, textAlign: TextAlign? = null) {
+internal fun LabelSmallText(modifier: Modifier = Modifier, text: String, color: Color = Color.Unspecified, textAlign: TextAlign? = null) {
     Text(
         modifier = modifier,
         text = text,
+        color = color,
         style = MaterialTheme.typography.labelSmall,
         textAlign = textAlign,
     )

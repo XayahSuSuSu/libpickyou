@@ -10,12 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import com.xayah.libpickyou.R
-import com.xayah.libpickyou.ui.model.ImageVectorToken
-import com.xayah.libpickyou.ui.model.StringResourceToken
-import com.xayah.libpickyou.ui.model.fromDrawable
-import com.xayah.libpickyou.ui.model.fromStringId
-import com.xayah.libpickyou.ui.model.value
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -27,6 +24,14 @@ internal fun rememberDialogState(): DialogState {
     val state = remember { DialogState() }
     state.Insert()
     return state
+}
+
+enum class DismissState {
+    DISMISS,
+    CANCEL,
+    CONFIRM;
+
+    val isConfirm get() = this == CONFIRM
 }
 
 internal class DialogState {
@@ -45,14 +50,14 @@ internal class DialogState {
      * If user clicks **confirmButton**, then return **Pair(true, T)**,
      * otherwise return **Pair(false, T)**.
      */
-    suspend fun <T> open(
+    private suspend fun <T> open(
         initialState: T,
-        title: StringResourceToken,
-        icon: ImageVectorToken? = null,
-        confirmText: StringResourceToken? = null,
-        dismissText: StringResourceToken? = null,
+        title: String,
+        icon: ImageVector? = null,
+        confirmText: String? = null,
+        dismissText: String? = null,
         block: @Composable (MutableState<T>) -> Unit,
-    ): Pair<Boolean, T> {
+    ): Pair<DismissState, T> {
         return suspendCancellableCoroutine { continuation ->
             continuation.invokeOnCancellation { dismiss() }
             content = {
@@ -60,22 +65,22 @@ internal class DialogState {
                 AlertDialog(
                     onDismissRequest = {
                         dismiss()
-                        continuation.resume(Pair(false, uiState.value))
+                        continuation.resume(Pair(DismissState.DISMISS, uiState.value))
                     },
                     confirmButton = {
-                        Button(text = confirmText ?: StringResourceToken.fromStringId(R.string.confirm), onClick = {
+                        Button(text = confirmText ?: stringResource(id = R.string.confirm), onClick = {
                             dismiss()
-                            continuation.resume(Pair(true, uiState.value))
+                            continuation.resume(Pair(DismissState.CONFIRM, uiState.value))
                         })
                     },
                     dismissButton = {
-                        TextButton(text = dismissText ?: StringResourceToken.fromStringId(R.string.cancel), onClick = {
+                        TextButton(text = dismissText ?: stringResource(id = R.string.cancel), onClick = {
                             dismiss()
-                            continuation.resume(Pair(false, uiState.value))
+                            continuation.resume(Pair(DismissState.CANCEL, uiState.value))
                         })
                     },
-                    title = { Text(text = title.value) },
-                    icon = icon?.let { { Icon(imageVector = icon.value, contentDescription = null) } },
+                    title = { Text(text = title) },
+                    icon = icon?.let { { Icon(imageVector = icon, contentDescription = null) } },
                     text = {
                         block(uiState)
                     },
@@ -84,17 +89,40 @@ internal class DialogState {
         }
     }
 
-    suspend fun openEdit() = open(
-        initialState = "",
-        title = StringResourceToken.fromStringId(R.string.create_folder),
-        icon = ImageVectorToken.fromDrawable(R.drawable.ic_rounded_folder),
+    suspend fun openEdit(
+        defValue: String = "",
+        title: String,
+        icon: ImageVector,
+        label: String? = null,
+    ) = open(
+        initialState = defValue,
+        title = title,
+        icon = icon,
         block = { state ->
             TextField(
                 value = state.value,
                 onValueChange = { state.value = it },
-                label = { Text(StringResourceToken.fromStringId(R.string.name).value) },
+                label = if (label == null) {
+                    null
+                } else {
+                    { Text(text = label) }
+                },
                 singleLine = true
             )
+        }
+    )
+
+    suspend fun openConfirm(
+        defValue: Boolean = false,
+        title: String,
+        icon: ImageVector,
+        text: String,
+    ) = open(
+        initialState = defValue,
+        title = title,
+        icon = icon,
+        block = { _ ->
+            Text(text = text)
         }
     )
 }

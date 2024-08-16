@@ -6,5 +6,5 @@ internal object TopAppBarTokens {
     val ContainerHeight = 64.0.dp
     val OnScrollContainerElevation = 3.0.dp
     val Padding = 8.dp
-    const val RootElementSymbol = "/"
+    const val ROOT_ELEMENT_SYMBOL = "/"
 }

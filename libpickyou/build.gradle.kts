@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("maven-publish")
 }
 
@@ -35,9 +36,6 @@ android {
         compose = true
         aidl = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    }
 }
 
 dependencies {
@@ -60,9 +58,6 @@ dependencies {
     // libsu
     implementation(libs.libsu.core)
     implementation(libs.libsu.service)
-
-    // Compose Navigation
-    implementation(libs.androidx.navigation.compose)
 
     // document
     implementation(libs.androidx.documentfile)

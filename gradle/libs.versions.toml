@@ -5,22 +5,20 @@ minSdk = "24"
 targetSdk = "34"
 versionCode = "8"
 versionName = "2.1.8"
-compose-compiler = "1.5.12"
 
 # libraries
 accompanist = "0.30.1"
-activity-compose = "1.9.0"
+activity-compose = "1.9.1"
 appcompat = "1.7.0"
 compose-bom = "2024.06.00"
 core-ktx = "1.13.1"
-lifecycle-runtime-ktx = "2.8.2"
-lifecycle-viewmodel-compose = "2.8.2"
+lifecycle-runtime-ktx = "2.8.4"
+lifecycle-viewmodel-compose = "2.8.4"
 libsu = "6.0.0"
-navigation-compose = "2.7.7"
 
 # plugins
-android-gradle-plugin = "8.5.1"
-kotlin = "1.9.23"
+android-gradle-plugin = "8.5.2"
+kotlin = "2.0.0"
 documentfile = "1.0.1"
 
 [libraries]
@@ -36,7 +34,6 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graph
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel-compose" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
 libsu-service = { module = "com.github.topjohnwu.libsu:service", version.ref = "libsu" }
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
@@ -44,4 +41,5 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 com-android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }

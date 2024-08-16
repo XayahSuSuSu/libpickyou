@@ -13,29 +13,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.xayah.libpickyou.ui.model.StringResourceToken
-import com.xayah.libpickyou.ui.model.value
 import com.xayah.libpickyou.ui.tokens.SizeTokens
 
 @ExperimentalMaterial3Api
 @Composable
-internal fun PermissionCard(modifier: Modifier = Modifier, content: StringResourceToken) {
+internal fun PermissionCard(modifier: Modifier = Modifier, content: String) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Column(modifier = Modifier.padding(SizeTokens.Level3)) {
+        Column(modifier = Modifier.padding(SizeTokens.Level16)) {
             Icon(
                 imageVector = Icons.Rounded.Star,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(SizeTokens.Level5)
-                    .paddingBottom(SizeTokens.Level1)
+                    .size(SizeTokens.Level32)
+                    .paddingBottom(SizeTokens.Level8)
             )
             BodyMediumText(
-                modifier = Modifier.paddingTop(SizeTokens.Level1),
-                text = content.value,
+                modifier = Modifier.paddingTop(SizeTokens.Level8),
+                text = content,
                 fontWeight = FontWeight.Bold
             )
         }

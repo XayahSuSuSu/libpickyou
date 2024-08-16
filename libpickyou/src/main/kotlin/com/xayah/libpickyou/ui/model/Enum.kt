@@ -7,8 +7,7 @@ enum class PermissionType {
 
 enum class PickerType {
     FILE,
-    DIRECTORY,
-    BOTH
+    DIRECTORY
 }
 
 internal fun PermissionType.isRoot() = this == PermissionType.ROOT

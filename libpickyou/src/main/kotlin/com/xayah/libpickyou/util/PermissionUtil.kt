@@ -12,6 +12,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.topjohnwu.superuser.Shell
+import com.xayah.libpickyou.PickYouLauncher
 import com.xayah.libpickyou.ui.model.PermissionType
 
 internal class PermissionUtil {
@@ -31,7 +32,8 @@ internal class PermissionUtil {
         fun checkStoragePermissions(state: MultiplePermissionsState, permissionType: PermissionType): Boolean =
             when (permissionType) {
                 PermissionType.ROOT -> {
-                    if (PreferencesUtil.readRequestedRoot().not()) false
+                    if (PickYouLauncher.sPickYouLauncher.checkPermission.not()) true
+                    else if (PreferencesUtil.readRequestedRoot().not()) false
                     else if (Shell.getShell().isRoot.not()) {
                         PreferencesUtil.saveRequestedRoot(false)
                         false
@@ -41,7 +43,8 @@ internal class PermissionUtil {
                 }
 
                 PermissionType.NORMAL -> {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    if (PickYouLauncher.sPickYouLauncher.checkPermission.not()) true
+                    else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                         state.allPermissionsGranted
                     } else {
                         Environment.isExternalStorageManager()

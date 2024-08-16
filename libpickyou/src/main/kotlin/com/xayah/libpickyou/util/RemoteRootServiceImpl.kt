@@ -21,12 +21,12 @@ internal class RemoteRootServiceImpl : IRemoteRootService.Stub() {
          */
         ShellUtils.fastCmd(
             """
-            mkdir -p "${LibPickYouTokens.ParcelTmpFilePath}/"
+            mkdir -p "${LibPickYouTokens.PARCEL_TMP_FILE_PATH}/"
             """.trimIndent()
         )
         ShellUtils.fastCmd(
             """
-            chcon -hR "u:object_r:shell_data_file:s0" "${LibPickYouTokens.ParcelTmpFilePath}/"
+            chcon -hR "u:object_r:shell_data_file:s0" "${LibPickYouTokens.PARCEL_TMP_FILE_PATH}/"
             """.trimIndent()
         )
     }
@@ -38,7 +38,7 @@ internal class RemoteRootServiceImpl : IRemoteRootService.Stub() {
             val children = PathUtil.traverse(pathString)
             children.writeToParcel(parcel, 0)
 
-            val tmp = File(LibPickYouTokens.ParcelTmpFilePath, LibPickYouTokens.ParcelTmpFileName)
+            val tmp = File(LibPickYouTokens.PARCEL_TMP_FILE_PATH, LibPickYouTokens.PARCEL_TMP_FILE_NAME)
             tmp.createNewFile()
             tmp.writeBytes(parcel.marshall())
             val pfd = ParcelFileDescriptor.open(tmp, ParcelFileDescriptor.MODE_READ_WRITE)
@@ -50,4 +50,6 @@ internal class RemoteRootServiceImpl : IRemoteRootService.Stub() {
     }
 
     override fun mkdirs(src: String): Boolean = PathUtil.mkdirs(src)
+
+    override fun getSymbolicLink(path: String): String? = PathUtil.getSymbolicLink(path)
 }

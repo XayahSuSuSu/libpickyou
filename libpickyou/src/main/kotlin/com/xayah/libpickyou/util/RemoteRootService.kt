@@ -31,28 +31,12 @@ internal class RemoteRootService(private val context: Context) {
     }
 
     companion object {
-        private fun getShellBuilder() = Shell.Builder.create()
-            .setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_REDIRECT_STDERR)
-            .setInitializers(EnvInitializer::class.java)
-            .setTimeout(3)
-
-        fun initService() = Shell.setDefaultBuilder(getShellBuilder())
-    }
-
-    private class EnvInitializer : Shell.Initializer() {
-        companion object {
-            fun initShell(shell: Shell) {
-                shell.newJob()
-                    .add("nsenter -t 1 -m su") // Switch to global namespace
-                    .add("set -o pipefail") // Ensure that the exit code of each command is correct.
-                    .exec()
-            }
-        }
-
-        override fun onInit(context: Context, shell: Shell): Boolean {
-            initShell(shell)
-            return true
-        }
+        fun initService() = Shell
+            .getShell()
+            .newJob()
+            .add("nsenter --mount=/proc/1/ns/mnt sh") // Switch to global namespace
+            .add("set -o pipefail") // Ensure that the exit code of each command is correct.
+            .exec()
     }
 
     class RemoteRootService : RootService() {
@@ -146,4 +130,6 @@ internal class RemoteRootService(private val context: Context) {
     }
 
     suspend fun mkdirs(src: String) = getService().mkdirs(src)
+
+    suspend fun getSymbolicLink(path: String): String? = getService().getSymbolicLink(path)
 }

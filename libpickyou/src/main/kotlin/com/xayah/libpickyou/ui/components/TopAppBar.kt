@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
@@ -107,7 +105,7 @@ internal fun PathChipGroup(
                     selected = false,
                     border = null,
                     shape = CircleShape,
-                    label = { Text(TopAppBarTokens.RootElementSymbol) },
+                    label = { Text(TopAppBarTokens.ROOT_ELEMENT_SYMBOL) },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
@@ -155,11 +153,10 @@ internal fun PathChipGroup(
 internal fun PickYouTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     title: String,
-    subtitle: String,
     path: List<String>,
     pathPrefixHiddenNum: Int,
     onArrowBackPressed: () -> Unit,
-    actions: @Composable RowScope.() -> Unit = {},
+    actions: @Composable() (RowScope.() -> Unit) = {},
     onPathChanged: (newPath: List<String>) -> Unit,
 ) {
     // Sets the app bar's height offset to collapse the entire bar's height when content is
@@ -211,10 +208,6 @@ internal fun PickYouTopAppBar(
                 ArrowBackIconButton(onArrowBackPressed)
                 Column(modifier = Modifier.weight(1f)) {
                     TopBarTitle(text = title)
-                    TopBarSubTitle(
-                        modifier = Modifier.horizontalScroll(rememberScrollState(0)),
-                        text = subtitle
-                    )
                 }
                 actions()
             }
