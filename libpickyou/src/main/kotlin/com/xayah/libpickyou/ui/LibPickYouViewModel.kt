@@ -270,14 +270,16 @@ internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, 
                         } else {
                             PathUtil.mkdirs("$parent/$child")
                         }
-                    Toast.makeText(
-                        context,
-                        if (result) {
-                            context.getString(R.string.created)
-                        } else {
-                            context.getString(R.string.failed_to_create)
-                        } + ": $child", Toast.LENGTH_SHORT
-                    ).show()
+                    withMainContext {
+                        Toast.makeText(
+                            context,
+                            if (result) {
+                                context.getString(R.string.created)
+                            } else {
+                                context.getString(R.string.failed_to_create)
+                            } + ": $child", Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
 
