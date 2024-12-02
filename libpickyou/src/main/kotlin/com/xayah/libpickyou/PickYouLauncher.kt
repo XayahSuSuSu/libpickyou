@@ -16,12 +16,12 @@ import com.xayah.libpickyou.ui.tokens.LibPickYouTokens
 import com.xayah.libpickyou.util.PreferencesUtil
 import com.xayah.libpickyou.util.ThemeType
 import com.xayah.libpickyou.util.registerForActivityResultCompat
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Pick you launcher
@@ -74,11 +74,14 @@ class PickYouLauncher(
                 onResult(result, onPathResult)
             }
 
-        private fun getLauncher(context: Context, requestCode: AtomicInteger, cont: Continuation<String>): ActivityResultLauncher<Intent> =
+        private fun getLauncher(context: Context, requestCode: AtomicInteger, cont: CancellableContinuation<String>): ActivityResultLauncher<Intent> =
             context.registerForActivityResultCompat(
                 requestCode,
                 ActivityResultContracts.StartActivityForResult()
             ) { result: ActivityResult ->
+                if (cont.isActive.not()) {
+                    return@registerForActivityResultCompat
+                }
                 if (result.resultCode == Activity.RESULT_OK) {
                     val r = result.data?.getStringExtra(LibPickYouTokens.INTENT_EXTRA_PATH)
                     if (r != null) {
@@ -104,7 +107,7 @@ class PickYouLauncher(
         launch(context)
     }
 
-    suspend fun awaitLaunch(context: Context): String = suspendCoroutine { cont ->
+    suspend fun awaitLaunch(context: Context): String = suspendCancellableCoroutine { cont ->
         // There is no cancellation support since we cannot cancel a launched Intent
         mLauncher = getLauncher(context, mNextLocalRequestCode, cont)
         launch(context)
