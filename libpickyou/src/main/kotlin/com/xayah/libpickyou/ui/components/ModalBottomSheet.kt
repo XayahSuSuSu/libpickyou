@@ -10,6 +10,7 @@ import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 
@@ -25,7 +26,7 @@ fun ModalBottomSheet(
         androidx.compose.material3.ModalBottomSheet(
             onDismissRequest = onDismissRequest,
             sheetState = sheetState,
-            windowInsets = WindowInsets(0, 0, 0, 0),
+            contentWindowInsets = { remember { WindowInsets(0, 0, 0, 0) } },
             properties = ModalBottomSheetDefaults.properties(shouldDismissOnBackPress = false)
         ) {
             content()
