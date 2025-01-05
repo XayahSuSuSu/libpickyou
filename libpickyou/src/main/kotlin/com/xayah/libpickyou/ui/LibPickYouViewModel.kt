@@ -270,6 +270,7 @@ internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, 
                         } else {
                             PathUtil.mkdirs("$parent/$child")
                         }
+                    emitIntent(IndexUiIntent.UpdatePathList(context))
                     withMainContext {
                         Toast.makeText(
                             context,
