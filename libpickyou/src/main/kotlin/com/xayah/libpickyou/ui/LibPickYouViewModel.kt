@@ -138,7 +138,7 @@ internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, 
                         }
                     }
                     emitIntent(IndexUiIntent.SetExceptionMessage(null))
-                    emitState(state.copy(children = children, canUp = isAccessible(uiState.value.pathList.toMutableList().apply { removeLast() })))
+                    emitState(state.copy(children = children, canUp = isAccessible(uiState.value.pathList.toMutableList().apply { removeLastOrNull() })))
                 }.onFailure {
                     emitIntent(IndexUiIntent.SetExceptionMessage(it.localizedMessage))
                 }
@@ -166,7 +166,7 @@ internal class LibPickYouViewModel : BaseViewModel<IndexUiState, IndexUiIntent, 
                 val context = intent.context
                 if (!state.canUp) return
                 val path = state.pathList.toMutableList()
-                path.removeLast()
+                path.removeLastOrNull()
                 onAccessible(path) {
                     emitState(state.copy(pathList = path.toList()))
                 }
